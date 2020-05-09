@@ -1,12 +1,14 @@
-﻿using System;
+using System;
 
-namespace NFL
+namespace NFL.Combine
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            CombineCollector cc = new CombineCollector();
+            cc.AllCombineWorkouts(2020);
+            cc.PrintResults();
         }
     }
 }

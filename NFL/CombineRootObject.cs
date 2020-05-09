@@ -1,43 +1,26 @@
-using System;
 using System.Collections.Generic;
 
 namespace NFL.Combine
 {
-    public class Data
-    {
-        public int id { get; set; }
-        public string shieldId { get; set; }
-        public string firstName { get; set; }
-        public string lastName { get; set; }
-        public string college { get; set; }
-        public string position { get; set; }
-        public string workoutName { get; set; }
-        public string video { get; set; }
-        public string result { get; set; }
-        public bool official { get; set; }
-        public bool topPerformer { get; set; }
-        public bool optOut { get; set; }
-    }
-
-    public class RootObject
+    public class CombineRootObject
     {
         public string resultUnit { get; set; }
-        public List<Data> data { get; set; }
+        public List<CombineWorkout> data { get; set; }
     }
 
-    public class WorkoutResults
+    public class CombineWorkout
     {
-        public int id { get; set; }
-        public string firstName { get; set; }
-        public string lastName { get; set; }
-        public string college { get; set; }
-        public string position { get; set; }
-        public float FORTY_YARD_DASH { get; set; }
-        public float BENCH_PRESS { get; set; }
-        public float VERTICAL_JUMP { get; set; }
-        public float BROAD_JUMP { get; set; }
-        public float THREE_CONE_DRILL { get; set; }
-        public float TWENTY_YARD_SHUTTLE { get; set; }
-        public float SIXTY_YARD_SHUTTLE { get; set; }
+        public int Id { get; set; }
+        public string ShieldId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string College { get; set; }
+        public string Position { get; set; }
+        public string WorkoutName { get; set; }
+        public string Video { get; set; }
+        public string Result { get; set; }
+        public bool Official { get; set; }
+        public bool TopPerformer { get; set; }
+        public bool OptOut { get; set; }
     }
 }
