@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-
-namespace NFL.Combine
+﻿namespace NFL.Combine
 {
     public class WorkoutResult : IWorkoutResult
     {
@@ -43,7 +40,7 @@ namespace NFL.Combine
         public override string ToString()
         {
             return $"" +
-                $"{this.season} " +
+                $"Season: {this.season}, " +
                 $"Player: {FirstName} {LastName}, " +
                 $"College: {College}, " +
                 $"Position: {Position}, " +

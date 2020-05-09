@@ -1,5 +1,4 @@
-﻿using System;
-namespace NFL.Combine
+﻿namespace NFL.Combine
 {
     public class PositionCategory
     {

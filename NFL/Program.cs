@@ -1,5 +1,3 @@
-using System;
-
 namespace NFL.Combine
 {
     class Program
@@ -7,8 +5,7 @@ namespace NFL.Combine
         static void Main(string[] args)
         {
             CombineCollector cc = new CombineCollector();
-            cc.AllCombineWorkouts(2020);
-            cc.PrintResults();
+            cc.BackloadCombineWorkouts();
         }
     }
 }
