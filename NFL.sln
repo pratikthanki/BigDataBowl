@@ -8,6 +8,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{E5C36999-7938-4FE6-868A-9A67BAB47275}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFL.BigDataBowl", "NFL.BigDataBowl\NFL.BigDataBowl.csproj", "{15C74D61-0D2E-46B5-8DCA-255B701809C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{AF3AA2C3-D1D2-4ED7-82E5-91B504530193}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF3AA2C3-D1D2-4ED7-82E5-91B504530193}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF3AA2C3-D1D2-4ED7-82E5-91B504530193}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5C36999-7938-4FE6-868A-9A67BAB47275}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5C36999-7938-4FE6-868A-9A67BAB47275}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5C36999-7938-4FE6-868A-9A67BAB47275}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5C36999-7938-4FE6-868A-9A67BAB47275}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15C74D61-0D2E-46B5-8DCA-255B701809C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15C74D61-0D2E-46B5-8DCA-255B701809C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15C74D61-0D2E-46B5-8DCA-255B701809C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15C74D61-0D2E-46B5-8DCA-255B701809C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
