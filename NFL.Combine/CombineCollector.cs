@@ -2,55 +2,56 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NFL.Shared;
 
 namespace NFL.Combine
 {
     public class CombineCollector
     {
-        private readonly string baseurl;
-        private readonly string[] workouts;
-        private readonly int[] seasons;
-        public List<WorkoutResult> results;
-        private Requester requester;
-        private FileWriter fileWriter;
-        private readonly string CombineStats;
+        private readonly string _baseurl;
+        private readonly string[] _workouts;
+        private readonly int[] _seasons;
+        public List<WorkoutResult> Results;
+        private Requester _requester;
+        private FileWriter _fileWriter;
+        private readonly string _combineStats;
 
         public CombineCollector()
         {
-            baseurl = @"http://www.nfl.com/liveupdate/combine/{0}/{1}/ALL.json";
-            workouts = new[] { "FORTY_YARD_DASH", "BENCH_PRESS", "VERTICAL_JUMP",
+            _baseurl = @"http://www.nfl.com/liveupdate/combine/{0}/{1}/ALL.json";
+            _workouts = new[] { "FORTY_YARD_DASH", "BENCH_PRESS", "VERTICAL_JUMP",
                 "BROAD_JUMP", "THREE_CONE_DRILL", "TWENTY_YARD_SHUTTLE", "SIXTY_YARD_SHUTTLE" };
-            seasons = new[] { 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 };
+            _seasons = new[] { 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 };
 
-            results = new List<WorkoutResult>();
-            requester = new Requester();
-            CombineStats = "CombineStats";
-            fileWriter = new FileWriter(CombineStats);
+            Results = new List<WorkoutResult>();
+            _requester = new Requester();
+            _combineStats = "CombineStats";
+            _fileWriter = new FileWriter(_combineStats);
         }
 
         private void CombineWorkout(int season, string workout)
         {
-            string url = string.Format(baseurl, season, workout);
+            string url = string.Format(_baseurl, season, workout);
 
-            string response = requester.GetData(url);
-            CombineRootObject response_json = JsonConvert.DeserializeObject<CombineRootObject>(response);
+            string response = _requester.GetData(url);
+            CombineRootObject responseJson = JsonConvert.DeserializeObject<CombineRootObject>(response);
 
-            foreach (CombineWorkout row in response_json.data)
+            foreach (CombineWorkout row in responseJson.Data)
             {
                 if (row == null)
                 {
                     continue;
                 }
 
-                if (!results.Exists(x => x.Id == row.Id))
+                if (!Results.Exists(x => x.Id == row.Id))
                 {
-                    results.Add(new WorkoutResult(row, season));
+                    Results.Add(new WorkoutResult(row, season));
                 }
 
                 UpsertCombineStat(row);
             }
 
-            fileWriter.WriteToFile(results.FindAll(x => x.season == season), $"{CombineStats}{season}");
+            _fileWriter.WriteToFile(Results.FindAll(x => x.Season == season), $"{_combineStats}{season}");
         }
 
         private void UpsertCombineStat(CombineWorkout row)
@@ -62,35 +63,35 @@ namespace NFL.Combine
                 result = float.Parse(row.Result);
             }
 
-            foreach (var item in results.Where(r => r.Id == row.Id))
+            foreach (var item in Results.Where(r => r.Id == row.Id))
             {
-                if (workoutName == WorkoutNames.FORTY_YARD_DASH)
+                if (workoutName == WorkoutNames.FortyYardDash)
                 {
-                    item.FORTY_YARD_DASH = result;
+                    item.FortyYardDash = result;
                 }
-                else if (workoutName == WorkoutNames.BENCH_PRESS)
+                else if (workoutName == WorkoutNames.BenchPress)
                 {
-                    item.BENCH_PRESS = result;
+                    item.BenchPress = result;
                 }
-                else if (workoutName == WorkoutNames.VERTICAL_JUMP)
+                else if (workoutName == WorkoutNames.VerticalJump)
                 {
-                    item.VERTICAL_JUMP = result;
+                    item.VerticalJump = result;
                 }
-                else if (workoutName == WorkoutNames.BROAD_JUMP)
+                else if (workoutName == WorkoutNames.BroadJump)
                 {
-                    item.BROAD_JUMP = result;
+                    item.BroadJump = result;
                 }
-                else if (workoutName == WorkoutNames.THREE_CONE_DRILL)
+                else if (workoutName == WorkoutNames.ThreeConeDrill)
                 {
-                    item.THREE_CONE_DRILL = result;
+                    item.ThreeConeDrill = result;
                 }
-                else if (workoutName == WorkoutNames.TWENTY_YARD_SHUTTLE)
+                else if (workoutName == WorkoutNames.TwentyYardShuttle)
                 {
-                    item.TWENTY_YARD_SHUTTLE = result;
+                    item.TwentyYardShuttle = result;
                 }
-                else if (workoutName == WorkoutNames.SIXTY_YARD_SHUTTLE)
+                else if (workoutName == WorkoutNames.SixtyYardShuttle)
                 {
-                    item.SIXTY_YARD_SHUTTLE = result;
+                    item.SixtyYardShuttle = result;
                 }
                 else
                 {
@@ -101,7 +102,7 @@ namespace NFL.Combine
 
         private void PrintResults()
         {
-            foreach (var result in results)
+            foreach (var result in Results)
             {
                 Console.WriteLine(result.ToString());
             }
@@ -109,7 +110,7 @@ namespace NFL.Combine
 
         public void AllCombineWorkouts(int season)
         {
-            foreach(var workout in workouts)
+            foreach(var workout in _workouts)
             {
                 Console.WriteLine($"Season: {season}, Workout: {workout}");
                 CombineWorkout(season, workout);
@@ -118,7 +119,7 @@ namespace NFL.Combine
 
         public void BackloadCombineWorkouts()
         {
-            foreach (var season in seasons)
+            foreach (var season in _seasons)
             {
                 AllCombineWorkouts(season);
             }

@@ -8,13 +8,13 @@ namespace NFL.Combine
     public class FileWriter
     {
         private string _currentDirectory;
-        private string folderPath;
+        private string _folderPath;
 
         public FileWriter(string folder)
         {
             //currentDirectory = Directory.GetCurrentDirectory();
-            _currentDirectory = @"/Users/PratikThanki/Projects/NFL/NFL/";
-            folderPath = Path.Combine(_currentDirectory, folder);
+            _currentDirectory = @"/Users/PratikThanki/Projects/NFL/Data/";
+            _folderPath = Path.Combine(_currentDirectory, folder);
 
         }
 
@@ -22,7 +22,7 @@ namespace NFL.Combine
         {
             CreateDirectory();
 
-            string path = Path.Combine(folderPath, fileName);
+            string path = Path.Combine(_folderPath, fileName);
             StreamWriter file = File.CreateText($"{path}.json");
             JsonSerializer serializer = new JsonSerializer();
 
@@ -33,10 +33,10 @@ namespace NFL.Combine
 
         private void CreateDirectory()
         {
-            if (!Directory.Exists(folderPath))
+            if (!Directory.Exists(_folderPath))
             {
-                Directory.CreateDirectory(folderPath);
-                Console.WriteLine($"Directory created: {folderPath}");
+                Directory.CreateDirectory(_folderPath);
+                Console.WriteLine($"Directory created: {_folderPath}");
             }
         }
     }

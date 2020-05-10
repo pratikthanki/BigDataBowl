@@ -5,7 +5,7 @@ namespace NFL.Combine
         static void Main(string[] args)
         {
             CombineCollector cc = new CombineCollector();
-            cc.BackloadCombineWorkouts();
+            cc.AllCombineWorkouts(2020);
         }
     }
 }

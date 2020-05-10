@@ -4,7 +4,7 @@ namespace NFL.Combine
 {
     public class CombineRootObject
     {
-        public string resultUnit { get; set; }
-        public List<CombineWorkout> data { get; set; }
+        public string ResultUnit { get; set; }
+        public List<CombineWorkout> Data { get; set; }
     }
 }

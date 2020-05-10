@@ -3,17 +3,17 @@ namespace NFL.BigDataBowl
 {
     public class Games
     {
-        public int season { get; set; }
-        public int week { get; set; }
-        public string gameDate { get; set; }
-        public int gameId { get; set; }
-        public string gameTimeEastern { get; set; }
+        public int Season { get; set; }
+        public int Week { get; set; }
+        public string GameDate { get; set; }
+        public int GameId { get; set; }
+        public string GameTimeEastern { get; set; }
         public int HomeScore { get; set; }
         public int VisitorScore { get; set; }
-        public string homeTeamAbbr { get; set; }
-        public string visitorTeamAbbr { get; set; }
-        public string homeDisplayName { get; set; }
-        public string visitorDisplayName { get; set; }
+        public string HomeTeamAbbr { get; set; }
+        public string VisitorTeamAbbr { get; set; }
+        public string HomeDisplayName { get; set; }
+        public string VisitorDisplayName { get; set; }
         public string Stadium { get; set; }
         public string Location { get; set; }
         public string StadiumType { get; set; }

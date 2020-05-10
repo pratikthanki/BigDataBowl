@@ -14,7 +14,7 @@
             this.LastName = _playerWorkout.LastName;
             this.College = _playerWorkout.College;
             this.Position = _playerWorkout.Position;
-            this.season = season;
+            this.Season = season;
         }
     
         public int Id { get; set; }
@@ -23,14 +23,14 @@
         public string LastName { get; set; }
         public string College { get; set; }
         public string Position { get; set; }
-        public int season { get; set; }
-        public float? FORTY_YARD_DASH { get; set; }
-        public float? BENCH_PRESS { get; set; }
-        public float? VERTICAL_JUMP { get; set; }
-        public float? BROAD_JUMP { get; set; }
-        public float? THREE_CONE_DRILL { get; set; }
-        public float? TWENTY_YARD_SHUTTLE { get; set; }
-        public float? SIXTY_YARD_SHUTTLE { get; set; }
+        public int Season { get; set; }
+        public float? FortyYardDash { get; set; }
+        public float? BenchPress { get; set; }
+        public float? VerticalJump { get; set; }
+        public float? BroadJump { get; set; }
+        public float? ThreeConeDrill { get; set; }
+        public float? TwentyYardShuttle { get; set; }
+        public float? SixtyYardShuttle { get; set; }
 
         public bool Equals(CombineWorkout row)
         {
@@ -40,17 +40,17 @@
         public override string ToString()
         {
             return $"" +
-                $"Season: {this.season}, " +
+                $"Season: {this.Season}, " +
                 $"Player: {FirstName} {LastName}, " +
                 $"College: {College}, " +
                 $"Position: {Position}, " +
-                $"FORTY_YARD_DASH: {FORTY_YARD_DASH}, " +
-                $"BENCH_PRESS: {BENCH_PRESS}, " +
-                $"VERTICAL_JUMP: {VERTICAL_JUMP}, " +
-                $"BROAD_JUMP: {BROAD_JUMP}, " +
-                $"THREE_CONE_DRILL: {THREE_CONE_DRILL}, " +
-                $"TWENTY_YARD_SHUTTLE: {TWENTY_YARD_SHUTTLE}, " +
-                $"SIXTY_YARD_SHUTTLE: {SIXTY_YARD_SHUTTLE}";
+                $"FORTY_YARD_DASH: {FortyYardDash}, " +
+                $"BENCH_PRESS: {BenchPress}, " +
+                $"VERTICAL_JUMP: {VerticalJump}, " +
+                $"BROAD_JUMP: {BroadJump}, " +
+                $"THREE_CONE_DRILL: {ThreeConeDrill}, " +
+                $"TWENTY_YARD_SHUTTLE: {TwentyYardShuttle}, " +
+                $"SIXTY_YARD_SHUTTLE: {SixtyYardShuttle}";
         }
     }
 }

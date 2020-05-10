@@ -1,29 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using NFL.Shared;
 
 namespace NFL.BigDataBowl
 {
     public class DataReader
     {
+        private readonly string _trackingUrl;
+        private readonly string _gamesUrl;
+        private readonly string _playUrl;
 
-        private readonly string trackingUrl;
-        private readonly string gamesUrl;
-        private readonly string playUrl;
-
-        private static List<Tracking> tracking;
-        private static List<Games> games;
-        private static List<Plays> plays;
+        private static List<Tracking> _tracking;
+        private static List<Games> _games;
+        private static List<Plays> _plays;
+        private readonly Requester _requester;
 
         public DataReader()
         {
-            trackingUrl = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data/tracking_gameId_2017090700.csv";
-            gamesUrl = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data/games.csv";
-            playUrl = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data/plays.csv";
+            _trackingUrl = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data/tracking_gameId_2017090700.csv";
+            _gamesUrl = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data/games.csv";
+            _playUrl = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data/plays.csv";
+            
+            _requester = new Requester();
+
         }
 
-        private void ReadCsv(string url)
+
+        private string GetCsv(string url)
         {
 
+            return "yes";
         }
+
     }
 }

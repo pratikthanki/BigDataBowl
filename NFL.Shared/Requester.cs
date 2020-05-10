@@ -1,14 +1,13 @@
 ﻿using System.IO;
 using System.Net;
 
-namespace NFL.Combine
+namespace NFL.Shared
 {
     public class Requester
     {
         public Requester()
         {
         }
-
         public string GetData(string url)
         {
             WebRequest request = WebRequest.Create(url);
