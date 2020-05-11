@@ -8,4 +8,10 @@
   <ItemGroup>
     <ProjectReference Include="..\NFL.Combine\NFL.Combine.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FileHelpers" Version="3.4.1" />
+    <PackageReference Include="CsvHelper" Version="15.0.5" />
+    <PackageReference Include="TinyCsvParser" Version="2.5.2" />
+    <PackageReference Include="LINQPad" Version="5.40.0" />
+  </ItemGroup>
 </Project>

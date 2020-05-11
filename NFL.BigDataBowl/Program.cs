@@ -7,6 +7,8 @@ namespace NFL.BigDataBowl
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+            DataReader dataReader = new DataReader();
+            dataReader.ParseGames();
         }
     }
 }
