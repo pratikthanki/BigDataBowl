@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace NFL.Shared
 {
@@ -8,7 +9,7 @@ namespace NFL.Shared
         public Requester()
         {
         }
-        public string GetData(string url)
+        public async Task<string> GetData(string url)
         {
             WebRequest request = WebRequest.Create(url);
 
@@ -19,7 +20,7 @@ namespace NFL.Shared
             using (Stream dataStream = response.GetResponseStream())
             using (StreamReader reader = new StreamReader(dataStream))
             {
-                string content = reader.ReadToEnd();
+                var content = await reader.ReadToEndAsync();
                 return content;
             }
         }

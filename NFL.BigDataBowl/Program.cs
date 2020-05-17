@@ -21,7 +21,7 @@ namespace NFL.BigDataBowl
                 .ConfigureServices((hostContext, services) =>
                 {
                     services
-                        .AddHostedService<DataReader>();
+                        .AddHostedService<BigDataBowlService>();
                 })
                 .UseConsoleLifetime();
         }

@@ -1,11 +1,13 @@
+using System.Threading.Tasks;
+
 namespace NFL.Combine
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             CombineCollector cc = new CombineCollector();
-            cc.AllCombineWorkouts(2020);
+            await cc.AllCombineWorkouts(2020);
         }
     }
 }

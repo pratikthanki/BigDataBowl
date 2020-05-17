@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NFL.Shared;
 
 namespace NFL.Combine
@@ -29,11 +30,11 @@ namespace NFL.Combine
             _fileWriter = new FileWriter(_combineStats);
         }
 
-        private void CombineWorkout(int season, string workout)
+        private async Task CombineWorkout(int season, string workout)
         {
             string url = string.Format(_baseurl, season, workout);
 
-            string response = _requester.GetData(url);
+            var response = await _requester.GetData(url);
             CombineRootObject responseJson = JsonConvert.DeserializeObject<CombineRootObject>(response);
 
             foreach (CombineWorkout row in responseJson.Data)
@@ -108,20 +109,20 @@ namespace NFL.Combine
             }
         }
 
-        public void AllCombineWorkouts(int season)
+        public async Task AllCombineWorkouts(int season)
         {
             foreach(var workout in _workouts)
             {
                 Console.WriteLine($"Season: {season}, Workout: {workout}");
-                CombineWorkout(season, workout);
+                await CombineWorkout(season, workout);
             }
         }
 
-        public void BackloadCombineWorkouts()
+        public async Task BackloadCombineWorkouts()
         {
             foreach (var season in _seasons)
             {
-                AllCombineWorkouts(season);
+                await AllCombineWorkouts(season);
             }
         }
     }
