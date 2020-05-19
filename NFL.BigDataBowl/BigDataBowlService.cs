@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -14,8 +13,9 @@ namespace NFL.BigDataBowl
 {
     public class BigDataBowlService : IHostedService
     {
-        private ILogger _logger;
-        private IHostApplicationLifetime _appLifetime;
+        private static ILogger Logger;
+        private Task _executingTask;
+
         private static Requester _requester;
         private static string _trackingPath;
         private static string _playsPath;
@@ -28,8 +28,12 @@ namespace NFL.BigDataBowl
             ILogger<BigDataBowlService> logger, 
             IHostApplicationLifetime appLifetime)
         {
-            _logger = logger;
-            _appLifetime = appLifetime;
+            Logger = logger;
+            CancellationTokenSource source = new CancellationTokenSource();
+            CancellationToken token = source.Token;
+            
+            Environment.ExitCode = 1;
+
             
             var basePath = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data";
             _trackingPath = $"{basePath}/tracking_gameId_{GameId}.csv";
@@ -40,7 +44,7 @@ namespace NFL.BigDataBowl
             PlayData = new List<Plays>();
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken token)
         {
             await ReadTracking();
             await ReadPlays();
@@ -52,7 +56,7 @@ namespace NFL.BigDataBowl
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken token)
         {
             throw new NotImplementedException();
         }
@@ -85,6 +89,7 @@ namespace NFL.BigDataBowl
                     PlayId = Convert.ToInt64(rowSplit[13])
                 });
             }
+            Logger.LogInformation($"Tracking data parsed: {TrackingData.Count}");
         }
 
         private static async Task ReadPlays()
@@ -132,10 +137,13 @@ namespace NFL.BigDataBowl
                     PlayDescription = rowSplit[26]
                 });
             }
+            Logger.LogInformation($"Plays data parsed: {PlayData.Count}");
         }
 
         private static async Task<string[]> ParseCsv(string path)
         {
+            Logger.LogInformation($"Reading from path: {path}");
+
             var data = await _requester.GetData(path);
             var csv = data.Split(
                 new[] { Environment.NewLine },
