@@ -20,9 +20,12 @@ namespace NFL.Combine
         public CombineCollector()
         {
             _baseurl = @"http://www.nfl.com/liveupdate/combine/{0}/{1}/ALL.json";
-            _workouts = new[] { "FORTY_YARD_DASH", "BENCH_PRESS", "VERTICAL_JUMP",
-                "BROAD_JUMP", "THREE_CONE_DRILL", "TWENTY_YARD_SHUTTLE", "SIXTY_YARD_SHUTTLE" };
-            _seasons = new[] { 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 };
+            _workouts = new[]
+            {
+                "FORTY_YARD_DASH", "BENCH_PRESS", "VERTICAL_JUMP",
+                "BROAD_JUMP", "THREE_CONE_DRILL", "TWENTY_YARD_SHUTTLE", "SIXTY_YARD_SHUTTLE"
+            };
+            _seasons = new[] {2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020};
 
             Results = new List<WorkoutResult>();
             _requester = new Requester();

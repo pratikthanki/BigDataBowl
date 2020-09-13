@@ -2,18 +2,16 @@
 {
     public class WorkoutResult : IWorkoutResult
     {
-        private readonly CombineWorkout _playerWorkout;
-
         public WorkoutResult(CombineWorkout playerWorkout, int season)
         {
-            _playerWorkout = playerWorkout;
+            var PlayerWorkout = playerWorkout;
 
-            this.Id = _playerWorkout.Id;
-            this.ShieldId = _playerWorkout.ShieldId;
-            this.FirstName = _playerWorkout.FirstName;
-            this.LastName = _playerWorkout.LastName;
-            this.College = _playerWorkout.College;
-            this.Position = _playerWorkout.Position;
+            this.Id = PlayerWorkout.Id;
+            this.ShieldId = PlayerWorkout.ShieldId;
+            this.FirstName = PlayerWorkout.FirstName;
+            this.LastName = PlayerWorkout.LastName;
+            this.College = PlayerWorkout.College;
+            this.Position = PlayerWorkout.Position;
             this.Season = season;
         }
     
@@ -39,8 +37,8 @@
 
         public override string ToString()
         {
-            return $"" +
-                $"Season: {this.Season}, " +
+            return
+                $"Season: {Season}, " +
                 $"Player: {FirstName} {LastName}, " +
                 $"College: {College}, " +
                 $"Position: {Position}, " +

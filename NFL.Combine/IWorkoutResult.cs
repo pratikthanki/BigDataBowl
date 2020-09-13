@@ -1,6 +1,6 @@
 ﻿namespace NFL.Combine
 {
-    interface IWorkoutResult
+    internal interface IWorkoutResult
     {
         public int Id { get; set; }
         public string ShieldId { get; set; }
