@@ -10,6 +10,7 @@ namespace NFL.BigDataBowl
         {
             CreateHostBuilder(args).Build().Run();
         }
+
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)

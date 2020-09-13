@@ -23,23 +23,23 @@ namespace NFL.BigDataBowl
 
         private static List<Tracking> TrackingData;
         private static List<Plays> PlayData;
-        
+
         public BigDataBowlService(
-            ILogger<BigDataBowlService> logger, 
+            ILogger<BigDataBowlService> logger,
             IHostApplicationLifetime appLifetime)
         {
             Logger = logger;
             CancellationTokenSource source = new CancellationTokenSource();
             CancellationToken token = source.Token;
-            
+
             Environment.ExitCode = 1;
 
-            
+
             var basePath = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data";
             _trackingPath = $"{basePath}/tracking_gameId_{GameId}.csv";
             _playsPath = $"{basePath}/plays.csv";
             _requester = new Requester();
-            
+
             TrackingData = new List<Tracking>();
             PlayData = new List<Plays>();
         }
@@ -48,7 +48,7 @@ namespace NFL.BigDataBowl
         {
             await ReadTracking();
             await ReadPlays();
-            
+
             var playOne = TrackingData.Where(x => x.PlayId == 1);
             foreach (var row in playOne)
             {
@@ -89,11 +89,12 @@ namespace NFL.BigDataBowl
                     PlayId = Convert.ToInt64(rowSplit[13])
                 });
             }
+
             Logger.LogInformation($"Tracking data parsed: {TrackingData.Count}");
         }
 
         private static async Task ReadPlays()
-        { 
+        {
             var plays = await ParseCsv(_playsPath);
             foreach (var row in plays)
             {
@@ -102,10 +103,10 @@ namespace NFL.BigDataBowl
                 parser.SetDelimiters(",");
 
                 var rowSplit = parser.ReadFields();
-                
+
                 if (rowSplit[0] != GameId)
                     continue;
-                
+
                 PlayData.Add(new Plays
                 {
                     GameId = Convert.ToInt64(rowSplit[0]),
@@ -116,11 +117,11 @@ namespace NFL.BigDataBowl
                     YardsToGo = Convert.ToInt32(rowSplit[5]),
                     PossessionTeam = rowSplit[6],
                     YardlineSide = rowSplit[7],
-                    YardlineNumber = rowSplit[8] == "NA" ? (int?)null : Convert.ToInt32(rowSplit[8]),
+                    YardlineNumber = rowSplit[8] == "NA" ? (int?) null : Convert.ToInt32(rowSplit[8]),
                     OffenseFormation = rowSplit[9],
                     PersonnelOffense = rowSplit[10],
-                    DefendersInTheBox = rowSplit[11] == "NA" ? (int?)null : Convert.ToInt32(rowSplit[11]),
-                    NumberOfPassRushers = rowSplit[12] == "NA" ? (int?)null : Convert.ToInt32(rowSplit[12]),
+                    DefendersInTheBox = rowSplit[11] == "NA" ? (int?) null : Convert.ToInt32(rowSplit[11]),
+                    NumberOfPassRushers = rowSplit[12] == "NA" ? (int?) null : Convert.ToInt32(rowSplit[12]),
                     PersonnelDefense = rowSplit[13],
                     HomeScoreBeforePlay = Convert.ToInt32(rowSplit[14]),
                     VisitorScoreBeforePlay = Convert.ToInt32(rowSplit[15]),
@@ -129,14 +130,15 @@ namespace NFL.BigDataBowl
                     IsPenalty = rowSplit[18],
                     IsStPlay = rowSplit[19],
                     SpecialTeamsPlayType = rowSplit[20],
-                    KickReturnYardage = rowSplit[21] == "NA" ? (int?)null : Convert.ToInt32(rowSplit[21]),
-                    PassLength = rowSplit[22] == "NA" ? (int?)null : Convert.ToInt32(rowSplit[22]),
+                    KickReturnYardage = rowSplit[21] == "NA" ? (int?) null : Convert.ToInt32(rowSplit[21]),
+                    PassLength = rowSplit[22] == "NA" ? (int?) null : Convert.ToInt32(rowSplit[22]),
                     PassResult = rowSplit[23],
-                    YardsAfterCatch = rowSplit[24] == "NA" ? (int?)null : Convert.ToInt32(rowSplit[24]),
+                    YardsAfterCatch = rowSplit[24] == "NA" ? (int?) null : Convert.ToInt32(rowSplit[24]),
                     PlayResult = Convert.ToInt32(rowSplit[25]),
                     PlayDescription = rowSplit[26]
                 });
             }
+
             Logger.LogInformation($"Plays data parsed: {PlayData.Count}");
         }
 
@@ -146,7 +148,7 @@ namespace NFL.BigDataBowl
 
             var data = await _requester.GetData(path);
             var csv = data.Split(
-                new[] { Environment.NewLine },
+                new[] {Environment.NewLine},
                 StringSplitOptions.None
             ).Skip(1).SkipLast(1).ToArray();
 
