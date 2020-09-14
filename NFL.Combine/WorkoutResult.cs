@@ -1,6 +1,6 @@
 ﻿namespace NFL.Combine
 {
-    public class WorkoutResult : IWorkoutResult
+    public class WorkoutResult
     {
         public WorkoutResult(CombineWorkout playerWorkout, int season)
         {
@@ -14,7 +14,7 @@
             this.Position = PlayerWorkout.Position;
             this.Season = season;
         }
-    
+
         public int Id { get; set; }
         public string ShieldId { get; set; }
         public string FirstName { get; set; }

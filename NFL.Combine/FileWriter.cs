@@ -7,37 +7,29 @@ namespace NFL.Combine
 {
     public class FileWriter
     {
-        private string _currentDirectory;
-        private string _folderPath;
+        private const string CurrentDirectory = @"/Users/PratikThanki/Projects/NFL/Data/";
+        private readonly string _folderPath;
 
         public FileWriter(string folder)
         {
-            //currentDirectory = Directory.GetCurrentDirectory();
-            _currentDirectory = @"/Users/PratikThanki/Projects/NFL/Data/";
-            _folderPath = Path.Combine(_currentDirectory, folder);
-
+            _folderPath = Path.Combine(CurrentDirectory, folder);
         }
 
         public void WriteToFile(List<WorkoutResult> data, string fileName)
         {
-            CreateDirectory();
+            // Create directory if it doesn't exist
+            if (Directory.Exists(_folderPath))
+                return;
 
-            string path = Path.Combine(_folderPath, fileName);
-            StreamWriter file = File.CreateText($"{path}.json");
-            JsonSerializer serializer = new JsonSerializer();
+            Directory.CreateDirectory(_folderPath);
+            Console.WriteLine($"Directory created: {_folderPath}");
 
-            //serialize object directly into file stream
+            var path = Path.Combine(_folderPath, fileName);
+            var file = File.CreateText($"{path}.json");
+            var serializer = new JsonSerializer();
+
             serializer.Serialize(file, data);
             file.Close();
-        }
-
-        private void CreateDirectory()
-        {
-            if (!Directory.Exists(_folderPath))
-            {
-                Directory.CreateDirectory(_folderPath);
-                Console.WriteLine($"Directory created: {_folderPath}");
-            }
         }
     }
 }
