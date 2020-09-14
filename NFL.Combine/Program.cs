@@ -6,8 +6,7 @@ namespace NFL.Combine
     {
         static async Task Main(string[] args)
         {
-            var cc = new CombineCollector();
-            await cc.AllCombineWorkouts(2020);
+            await CombineCollector.AllCombineWorkouts(2020);
         }
     }
 }

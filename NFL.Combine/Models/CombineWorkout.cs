@@ -15,5 +15,11 @@ namespace NFL.Combine.Models
         public bool Official { get; set; }
         public bool TopPerformer { get; set; }
         public bool OptOut { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Id}, {ShieldId}, {FirstName}, {LastName}, {College}, {Position}, " +
+                   $"{WorkoutName}, {Video}, {Result}, {Official}, {TopPerformer}, {OptOut}";
+        }
     }
 }

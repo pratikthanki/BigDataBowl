@@ -10,14 +10,14 @@ namespace NFL.Combine
 {
     public class CombineCollector
     {
-        private readonly List<WorkoutResult> Results;
-        private readonly FileWriter _fileWriter;
+        private static List<WorkoutResult> Results;
+        private static FileWriter _fileWriter;
 
         private const string BaseUrl = @"http://www.nfl.com/liveupdate/combine/{0}/{1}/ALL.json";
         private readonly int[] _seasons = {2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020};
         private const string CombineStats = "CombineStats";
 
-        private readonly string[] _workouts =
+        private static readonly string[] _workouts =
         {
             "FORTY_YARD_DASH", "BENCH_PRESS", "VERTICAL_JUMP",
             "BROAD_JUMP", "THREE_CONE_DRILL", "TWENTY_YARD_SHUTTLE", "SIXTY_YARD_SHUTTLE"
@@ -29,7 +29,7 @@ namespace NFL.Combine
             _fileWriter = new FileWriter(CombineStats);
         }
 
-        private async Task GetCombineWorkout(int season, string workout)
+        private static async Task GetCombineWorkout(int season, string workout)
         {
             var url = string.Format(BaseUrl, season, workout);
 
@@ -42,13 +42,14 @@ namespace NFL.Combine
                     Results.Add(new WorkoutResult(row, season));
 
                 UpsertCombineStat(row);
+                Console.WriteLine(row.ToString());
             }
 
-            _fileWriter.WriteToFile(
-                Results.FindAll(x => x.Season == season), $"{CombineStats}{season}");
+            // _fileWriter.WriteToFile(
+                // Results.FindAll(x => x.Season == season), $"{CombineStats}{season}");
         }
 
-        private void UpsertCombineStat(CombineWorkout row)
+        private static void UpsertCombineStat(CombineWorkout row)
         {
             var workoutName = row.WorkoutName;
             float? result = null;
@@ -90,19 +91,13 @@ namespace NFL.Combine
                 Console.WriteLine(result.ToString());
         }
 
-        public async Task AllCombineWorkouts(int season)
+        public static async Task AllCombineWorkouts(int season)
         {
             foreach (var workout in _workouts)
             {
                 Console.WriteLine($"Season: {season}, Workout: {workout}");
                 await GetCombineWorkout(season, workout);
             }
-        }
-
-        public async Task BackloadCombineWorkouts()
-        {
-            foreach (var season in _seasons)
-                await AllCombineWorkouts(season);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using NFL.Combine.Models;
-
+﻿
 namespace NFL.Combine.Models
 {
     public class WorkoutResult
