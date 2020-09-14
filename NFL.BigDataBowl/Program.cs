@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NFL.BigDataBowl.Services;
+using NFL.BigDataBowl.Utilities;
 
 namespace NFL.BigDataBowl
 {
@@ -22,7 +24,7 @@ namespace NFL.BigDataBowl
                 .ConfigureServices((hostContext, services) =>
                 {
                     services
-                        .AddHostedService<BigDataBowlService>()
+                        .AddHostedService<TrackingService>()
                         .AddSingleton(typeof(Requester));
                 })
                 .UseConsoleLifetime();

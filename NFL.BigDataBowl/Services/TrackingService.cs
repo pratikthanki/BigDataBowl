@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
+using NFL.BigDataBowl.Models;
+using NFL.BigDataBowl.Utilities;
 
-namespace NFL.BigDataBowl
+namespace NFL.BigDataBowl.Services
 {
-    public class BigDataBowlService : IHostedService
+    public class TrackingService : IHostedService
     {
         private static ILogger Logger;
         private Task _executingTask;
@@ -22,7 +24,7 @@ namespace NFL.BigDataBowl
         private readonly string GamesPath = $"{BasePath}/games.csv";
         private readonly string PlayersPath = $"{BasePath}/players.csv";
 
-        public BigDataBowlService(ILogger<BigDataBowlService> logger, IHostApplicationLifetime appLifetime)
+        public TrackingService(ILogger<TrackingService> logger, IHostApplicationLifetime appLifetime)
         {
             Logger = logger;
             var source = new CancellationTokenSource();
@@ -49,7 +51,9 @@ namespace NFL.BigDataBowl
         private async Task<List<Tracking>> ReadTracking()
         {
             var Tracking = new List<Tracking>();
-            var tracking = await ParseCsv(TrackingPath);
+
+            Logger.LogInformation($"Reading from path: {TrackingPath}");
+            var tracking = await CsvReader.ParseCsv(TrackingPath);
 
             foreach (var row in tracking)
             {
@@ -84,12 +88,13 @@ namespace NFL.BigDataBowl
         private async Task<List<Plays>> ReadPlays()
         {
             var Plays = new List<Plays>();
-            var plays = await ParseCsv(PlaysPath);
+            
+            Logger.LogInformation($"Reading from path: {PlaysPath}");
+            var plays = await CsvReader.ParseCsv(PlaysPath);
 
             foreach (var row in plays)
             {
-                var parser = new TextFieldParser(new StringReader(row));
-                parser.HasFieldsEnclosedInQuotes = true;
+                var parser = new TextFieldParser(new StringReader(row)) {HasFieldsEnclosedInQuotes = true};
                 parser.SetDelimiters(",");
 
                 var rowSplit = parser.ReadFields();
@@ -131,20 +136,6 @@ namespace NFL.BigDataBowl
 
             Logger.LogInformation($"Plays data parsed: {Plays.Count}");
             return Plays;
-        }
-
-        private static async Task<List<string>> ParseCsv(string path)
-        {
-            Logger.LogInformation($"Reading from path: {path}");
-
-            var data = await Requester.GetData(path);
-            var csv = data
-                .Split(new[] {Environment.NewLine}, StringSplitOptions.None)
-                .Skip(1)
-                .SkipLast(1)
-                .ToList();
-
-            return csv;
         }
     }
 }

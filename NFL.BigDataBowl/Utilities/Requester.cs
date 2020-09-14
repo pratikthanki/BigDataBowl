@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 
-namespace NFL.BigDataBowl
+namespace NFL.BigDataBowl.Utilities
 {
     public class Requester
     {
