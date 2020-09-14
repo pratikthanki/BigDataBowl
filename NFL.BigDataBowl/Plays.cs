@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace NFL.BigDataBowl
 {
     public class Plays

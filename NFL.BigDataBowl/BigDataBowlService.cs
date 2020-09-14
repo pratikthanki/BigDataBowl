@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
-using NFL.Shared;
 
 namespace NFL.BigDataBowl
 {
@@ -16,44 +15,30 @@ namespace NFL.BigDataBowl
         private static ILogger Logger;
         private Task _executingTask;
 
-        private static Requester _requester;
-        private static string _trackingPath;
-        private static string _playsPath;
         private const string GameId = "2017090700";
+        private const string BasePath = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data";
+        private readonly string TrackingPath = $"{BasePath}/tracking_gameId_{GameId}.csv";
+        private readonly string PlaysPath = $"{BasePath}/plays.csv";
+        private readonly string GamesPath = $"{BasePath}/games.csv";
+        private readonly string PlayersPath = $"{BasePath}/players.csv";
 
-        private static List<Tracking> TrackingData;
-        private static List<Plays> PlayData;
-
-        public BigDataBowlService(
-            ILogger<BigDataBowlService> logger,
-            IHostApplicationLifetime appLifetime)
+        public BigDataBowlService(ILogger<BigDataBowlService> logger, IHostApplicationLifetime appLifetime)
         {
             Logger = logger;
-            CancellationTokenSource source = new CancellationTokenSource();
-            CancellationToken token = source.Token;
+            var source = new CancellationTokenSource();
+            var token = source.Token;
 
             Environment.ExitCode = 1;
-
-
-            var basePath = @"https://raw.githubusercontent.com/nfl-football-ops/Big-Data-Bowl/master/Data";
-            _trackingPath = $"{basePath}/tracking_gameId_{GameId}.csv";
-            _playsPath = $"{basePath}/plays.csv";
-            _requester = new Requester();
-
-            TrackingData = new List<Tracking>();
-            PlayData = new List<Plays>();
         }
 
         public async Task StartAsync(CancellationToken token)
         {
-            await ReadTracking();
-            await ReadPlays();
+            var Tracking = await ReadTracking();
+            var Plays = await ReadPlays();
 
-            var playOne = TrackingData.Where(x => x.PlayId == 1);
+            var playOne = Tracking.Where(x => x.PlayId == 1);
             foreach (var row in playOne)
-            {
                 Console.WriteLine(row);
-            }
         }
 
         public Task StopAsync(CancellationToken token)
@@ -61,9 +46,11 @@ namespace NFL.BigDataBowl
             throw new NotImplementedException();
         }
 
-        private static async Task ReadTracking()
+        private async Task<List<Tracking>> ReadTracking()
         {
-            var tracking = await ParseCsv(_trackingPath);
+            var Tracking = new List<Tracking>();
+            var tracking = await ParseCsv(TrackingPath);
+
             foreach (var row in tracking)
             {
                 var rowSplit = row.Split(",");
@@ -71,7 +58,7 @@ namespace NFL.BigDataBowl
                 if (rowSplit[0] == "NA")
                     continue;
 
-                TrackingData.Add(new Tracking
+                Tracking.Add(new Tracking
                 {
                     Time = Convert.ToDateTime(rowSplit[0]),
                     X = Convert.ToDouble(rowSplit[1]),
@@ -90,15 +77,18 @@ namespace NFL.BigDataBowl
                 });
             }
 
-            Logger.LogInformation($"Tracking data parsed: {TrackingData.Count}");
+            Logger.LogInformation($"Tracking data parsed: {Tracking.Count}");
+            return Tracking;
         }
 
-        private static async Task ReadPlays()
+        private async Task<List<Plays>> ReadPlays()
         {
-            var plays = await ParseCsv(_playsPath);
+            var Plays = new List<Plays>();
+            var plays = await ParseCsv(PlaysPath);
+
             foreach (var row in plays)
             {
-                TextFieldParser parser = new TextFieldParser(new StringReader(row));
+                var parser = new TextFieldParser(new StringReader(row));
                 parser.HasFieldsEnclosedInQuotes = true;
                 parser.SetDelimiters(",");
 
@@ -107,7 +97,7 @@ namespace NFL.BigDataBowl
                 if (rowSplit[0] != GameId)
                     continue;
 
-                PlayData.Add(new Plays
+                Plays.Add(new Plays
                 {
                     GameId = Convert.ToInt64(rowSplit[0]),
                     PlayId = Convert.ToInt64(rowSplit[1]),
@@ -139,18 +129,20 @@ namespace NFL.BigDataBowl
                 });
             }
 
-            Logger.LogInformation($"Plays data parsed: {PlayData.Count}");
+            Logger.LogInformation($"Plays data parsed: {Plays.Count}");
+            return Plays;
         }
 
-        private static async Task<string[]> ParseCsv(string path)
+        private static async Task<List<string>> ParseCsv(string path)
         {
             Logger.LogInformation($"Reading from path: {path}");
 
-            var data = await _requester.GetData(path);
-            var csv = data.Split(
-                new[] {Environment.NewLine},
-                StringSplitOptions.None
-            ).Skip(1).SkipLast(1).ToArray();
+            var data = await Requester.GetData(path);
+            var csv = data
+                .Split(new[] {Environment.NewLine}, StringSplitOptions.None)
+                .Skip(1)
+                .SkipLast(1)
+                .ToList();
 
             return csv;
         }
