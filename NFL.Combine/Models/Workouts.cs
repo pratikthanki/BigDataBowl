@@ -1,6 +1,7 @@
-﻿namespace NFL.Combine
+﻿
+namespace NFL.Combine.Models
 {
-    public class Workouts
+    public static class Workouts
     {
         public const string FortyYardDash = "40 Yard Dash";
         public const string BenchPress = "Bench Press";

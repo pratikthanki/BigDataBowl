@@ -1,10 +1,10 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
+using NFL.Combine.Models;
+using NFL.BigDataBowl.Utilities;
 
 namespace NFL.Combine
 {
@@ -33,7 +33,7 @@ namespace NFL.Combine
         {
             var url = string.Format(BaseUrl, season, workout);
 
-            var response = await GetData(url);
+            var response = await Requester.GetData(url);
             var responseJson = JsonConvert.DeserializeObject<CombineRootObject>(response);
 
             foreach (var row in responseJson.Data.Where(row => row != null))
@@ -103,25 +103,6 @@ namespace NFL.Combine
         {
             foreach (var season in _seasons)
                 await AllCombineWorkouts(season);
-        }
-
-        private static async Task<string> GetData(string url)
-        {
-            var request = WebRequest.Create(url);
-
-            request.ContentType = "application/json";
-            request.Headers.Add("User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36");
-
-            using var response = (HttpWebResponse) await request.GetResponseAsync();
-            await using var dataStream = response.GetResponseStream();
-
-            if (dataStream == null)
-                return null;
-
-            using var reader = new StreamReader(dataStream);
-            var content = await reader.ReadToEndAsync();
-            return content;
         }
     }
 }

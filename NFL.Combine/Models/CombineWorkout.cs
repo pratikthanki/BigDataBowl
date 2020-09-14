@@ -1,7 +1,7 @@
 ﻿
-namespace NFL.Combine
+namespace NFL.Combine.Models
 {
-    public class CombineWorkout
+    public abstract class CombineWorkout
     {
         public int Id { get; set; }
         public string ShieldId { get; set; }

@@ -13,6 +13,6 @@
     <None Remove="..\.editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NFL.Shared\NFL.Shared.csproj" />
+    <ProjectReference Include="..\NFL.BigDataBowl\NFL.BigDataBowl.csproj" />
   </ItemGroup>
 </Project>

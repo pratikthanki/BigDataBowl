@@ -1,4 +1,5 @@
-﻿namespace NFL.Combine
+﻿
+namespace NFL.Combine.Models
 {
     public class Positions
     {

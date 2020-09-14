@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using NFL.Combine.Models;
 
 namespace NFL.Combine
 {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace NFL.Combine
+namespace NFL.Combine.Models
 {
     public class CombineRootObject
     {
