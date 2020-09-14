@@ -10,8 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFL.BigDataBowl", "NFL.BigD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFL.Combine", "NFL.Combine\NFL.Combine.csproj", "{DE1E7A58-8206-49B6-B6DC-3DB9F09678FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFL.Shared", "NFL.Shared\NFL.Shared.csproj", "{2D05642C-A231-4CEF-A793-F6C74AE41E74}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{DE1E7A58-8206-49B6-B6DC-3DB9F09678FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE1E7A58-8206-49B6-B6DC-3DB9F09678FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE1E7A58-8206-49B6-B6DC-3DB9F09678FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D05642C-A231-4CEF-A793-F6C74AE41E74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D05642C-A231-4CEF-A793-F6C74AE41E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D05642C-A231-4CEF-A793-F6C74AE41E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D05642C-A231-4CEF-A793-F6C74AE41E74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
