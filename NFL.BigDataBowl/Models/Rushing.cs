@@ -5,17 +5,17 @@ namespace NFL.BigDataBowl.Models
 {
     public class Rushing
     {
-        public int GameId { get; set; }
+        public long GameId { get; set; }
         public long PlayId { get; set; }
         public string Team { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double S { get; set; }
-        public double A { get; set; }
-        public double Dis { get; set; }
-        public double Orientation { get; set; }
-        public double Dir { get; set; }
-        public int NflId { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float S { get; set; }
+        public float A { get; set; }
+        public float Dis { get; set; }
+        public float Orientation { get; set; }
+        public float Dir { get; set; }
+        public long NflId { get; set; }
         public string DisplayName { get; set; }
         public int JerseyNumber { get; set; }
         public int Season { get; set; }
@@ -28,7 +28,7 @@ namespace NFL.BigDataBowl.Models
         public string FieldPosition { get; set; }
         public int HomeScoreBeforePlay { get; set; }
         public int VisitorScoreBeforePlay { get; set; }
-        public int NflIdRusher { get; set; }
+        public long NflIdRusher { get; set; }
         public string OffenseFormation { get; set; }
         public string OffensePersonnel { get; set; }
         public int DefendersInTheBox { get; set; }
@@ -38,7 +38,7 @@ namespace NFL.BigDataBowl.Models
         public DateTime TimeSnap { get; set; }
         public int Yards { get; set; }
         public string PlayerHeight { get; set; }
-        public int PlayerWeight { get; set; }
+        public long PlayerWeight { get; set; }
         public DateTime PlayerBirthDate { get; set; }
         public string PlayerCollegeName { get; set; }
         public string Position { get; set; }
@@ -50,9 +50,9 @@ namespace NFL.BigDataBowl.Models
         public string StadiumType { get; set; }
         public string Turf { get; set; }
         public string GameWeather { get; set; }
-        public int Temperature { get; set; }
-        public int Humidity { get; set; }
-        public int WindSpeed { get; set; }
+        public long Temperature { get; set; }
+        public long Humidity { get; set; }
+        public string WindSpeed { get; set; }
         public string WindDirection { get; set; }
     }
 
