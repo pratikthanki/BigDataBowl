@@ -24,7 +24,7 @@ namespace NFL.BigDataBowl
                 .ConfigureServices((hostContext, services) =>
                 {
                     services
-                        .AddHostedService<TrackingService>()
+                        .AddHostedService<RushingService>()
                         .AddSingleton(typeof(Requester));
                 })
                 .UseConsoleLifetime();
