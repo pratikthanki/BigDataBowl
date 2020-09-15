@@ -1,5 +1,4 @@
 using System;
-using CsvHelper.Configuration;
 
 namespace NFL.BigDataBowl.Models
 {
@@ -54,62 +53,15 @@ namespace NFL.BigDataBowl.Models
         public long Humidity { get; set; }
         public string WindSpeed { get; set; }
         public string WindDirection { get; set; }
+        public bool IsLeftDirection { get; set; }
+        public bool IsBallCarrier { get; set; }
+        public float MinutesRemainingInQuarter { get; set; }
+        public int PlayerHeightInches { get; set; }
+        public int TimeDelta { get; set; }
+        public float TransformedX { get; set; }
+        public float TransformedY { get; set; }
+        public string TeamOnOffense { get; set; }
+        public bool IsOnOffense { get; set; }
+        public int YardsFromOwnGoal { get; set; }
     }
-
-    public class ModelClassMap : ClassMap<Rushing>
-    {
-        public ModelClassMap()
-        {
-            Map(m => m.GameId).Name("GameId");
-            Map(m => m.PlayId).Name("PlayId");
-            Map(m => m.Team).Name("Team");
-            Map(m => m.X).Name("X");
-            Map(m => m.Y).Name("Y");
-            Map(m => m.S).Name("S");
-            Map(m => m.A).Name("A");
-            Map(m => m.Dis).Name("Dis");
-            Map(m => m.Orientation).Name("Orientation");
-            Map(m => m.Dir).Name("Dir");
-            Map(m => m.NflId).Name("NflId");
-            Map(m => m.DisplayName).Name("DisplayName");
-            Map(m => m.JerseyNumber).Name("JerseyNumber");
-            Map(m => m.Season).Name("Season");
-            Map(m => m.YardLine).Name("YardLine");
-            Map(m => m.Quarter).Name("Quarter");
-            Map(m => m.GameClock).Name("GameClock");
-            Map(m => m.PossessionTeam).Name("PossessionTeam");
-            Map(m => m.Down).Name("Down");
-            Map(m => m.Distance).Name("Distance");
-            Map(m => m.FieldPosition).Name("FieldPosition");
-            Map(m => m.HomeScoreBeforePlay).Name("HomeScoreBeforePlay");
-            Map(m => m.VisitorScoreBeforePlay).Name("VisitorScoreBeforePlay");
-            Map(m => m.NflIdRusher).Name("NflIdRusher");
-            Map(m => m.OffenseFormation).Name("OffenseFormation");
-            Map(m => m.OffensePersonnel).Name("OffensePersonnel");
-            Map(m => m.DefendersInTheBox).Name("DefendersInTheBox");
-            Map(m => m.DefensePersonnel).Name("DefensePersonnel");
-            Map(m => m.PlayDirection).Name("PlayDirection");
-            Map(m => m.TimeHandoff).Name("TimeHandoff");
-            Map(m => m.TimeSnap).Name("TimeSnap");
-            Map(m => m.Yards).Name("Yards");
-            Map(m => m.PlayerHeight).Name("PlayerHeight");
-            Map(m => m.PlayerWeight).Name("PlayerWeight");
-            Map(m => m.PlayerBirthDate).Name("PlayerBirthDate");
-            Map(m => m.PlayerCollegeName).Name("PlayerCollegeName");
-            Map(m => m.Position).Name("Position");
-            Map(m => m.HomeTeamAbbr).Name("HomeTeamAbbr");
-            Map(m => m.VisitorTeamAbbr).Name("VisitorTeamAbbr");
-            Map(m => m.Week).Name("Week");
-            Map(m => m.Stadium).Name("Stadium");
-            Map(m => m.Location).Name("Location");
-            Map(m => m.StadiumType).Name("StadiumType");
-            Map(m => m.Turf).Name("Turf");
-            Map(m => m.GameWeather).Name("GameWeather");
-            Map(m => m.Temperature).Name("Temperature");
-            Map(m => m.Humidity).Name("Humidity");
-            Map(m => m.WindSpeed).Name("WindSpeed");
-            Map(m => m.WindDirection).Name("WindDirection");
-        }
-    }
-
 }
