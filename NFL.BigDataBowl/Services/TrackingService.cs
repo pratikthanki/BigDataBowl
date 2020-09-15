@@ -53,7 +53,7 @@ namespace NFL.BigDataBowl.Services
             var Tracking = new List<Tracking>();
 
             Logger.LogInformation($"Reading from path: {TrackingPath}");
-            var tracking = await CsvReader.ParseCsv(TrackingPath);
+            var tracking = await CsvReader.RequestCsv(TrackingPath);
 
             foreach (var row in tracking)
             {
@@ -90,7 +90,7 @@ namespace NFL.BigDataBowl.Services
             var Plays = new List<Plays>();
             
             Logger.LogInformation($"Reading from path: {PlaysPath}");
-            var plays = await CsvReader.ParseCsv(PlaysPath);
+            var plays = await CsvReader.RequestCsv(PlaysPath);
 
             foreach (var row in plays)
             {
