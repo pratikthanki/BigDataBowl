@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using NFL.BigDataBowl.Utilities;
 
 namespace NFL.BigDataBowl.Utilities
 {
     public static class CsvReader
     {
-        public static async Task<List<string>> ParseCsv(string path)
+        public static async Task<List<string>> RequestCsv(string path)
         {
             var data = await Requester.GetData(path);
             var csv = data
@@ -18,6 +19,18 @@ namespace NFL.BigDataBowl.Utilities
                 .ToList();
 
             return csv;
+        }
+
+        public static string GetAbsolutePath(string relativePath)
+        {
+            var _dataRoot = new FileInfo(typeof(Program).Assembly.Location);
+
+            Debug.Assert(_dataRoot.Directory != null);
+            var assemblyFolderPath = _dataRoot.Directory.FullName;
+
+            var fullPath = Path.Combine(assemblyFolderPath, relativePath);
+
+            return fullPath;
         }
     }
 }

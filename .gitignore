@@ -404,3 +404,4 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 Data/BigDataBowl/train.csv
+Data/train.csv
