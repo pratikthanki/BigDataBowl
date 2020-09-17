@@ -29,8 +29,6 @@ namespace NFL.BigDataBowl.Services
         public async Task StartAsync(CancellationToken token)
         {
             var rushingPlays = ReadTracking();
-            
-            Console.WriteLine();
 
         }
 
@@ -135,28 +133,43 @@ namespace NFL.BigDataBowl.Services
 
             foreach (var play in rushingPlays)
             {
-                play.IsLeftDirection = play.PlayDirection == "left";
-                play.IsBallCarrier = play.NflId == play.NflIdRusher;
-
-                play.TeamOnOffense = play.PossessionTeam == play.HomeTeamAbbr ? "home" : "away";
-                play.IsOnOffense = play.Team == play.TeamOnOffense;
-
-                play.YardsFromOwnGoal = 
-                    play.FieldPosition == play.PossessionTeam 
-                        ? play.YardLine == 50 ? 50 : play.YardLine
-                        : 50 + (50 - play.YardLine);
-                
-                play.TransformedX = play.IsLeftDirection ? 120 - play.X : play.X;
-                play.TransformedY = play.IsLeftDirection ? 160 / 3 - play.Y : play.Y;
-
-                play.MinutesRemainingInQuarter = MinutesRemaining(play.GameClock);
-                play.PlayerHeightInches = PlayerHeightInches(play.PlayerHeight);
-
+                // Ensure team names are consistent across all names
                 play.PossessionTeam = teamMap[play.PossessionTeam];
                 play.HomeTeamAbbr = teamMap[play.HomeTeamAbbr];
                 play.VisitorTeamAbbr = teamMap[play.VisitorTeamAbbr];
+                play.FieldPosition = teamMap[play.FieldPosition];
 
+                // New bool columns 
+                play.TeamOnOffense = play.PossessionTeam == play.HomeTeamAbbr ? "home" : "away";
+                play.IsOnOffense = play.Team == play.TeamOnOffense;
+                play.IsLeftDirection = play.PlayDirection == "left";
+                play.IsBallCarrier = play.NflId == play.NflIdRusher;
+
+                play.MinutesRemainingInQuarter = MinutesRemaining(play.GameClock);
                 play.TimeDelta = (int) play.TimeHandoff.Subtract(play.TimeSnap).TotalSeconds;
+
+                play.YardsFromOwnGoal = play.FieldPosition == play.PossessionTeam
+                    ? play.YardLine == 50 ? 50 : play.YardLine
+                    : 50 + (50 - play.YardLine);
+
+                // Standardise location metrics so offense is heading right, otherwise rotate
+                play.StandardisedYardLine =
+                    play.FieldPosition == play.PossessionTeam ? play.YardLine : 100 - play.YardLine;
+                play.StandardisedX = play.IsLeftDirection ? 120 - play.X : play.X;
+                play.StandardisedY = (float) (play.IsLeftDirection ? 160 / 3.0 - play.Y : play.Y);
+                play.StandardisedOrientation = play.IsLeftDirection ? (180 + play.Orientation) % 360 : play.Orientation;
+                play.StandardisedDir = play.IsLeftDirection ? (180 + play.Dir) % 360 : play.Dir;
+                
+                play.StandardisedSpeedX =
+                    (float) (play.S * Math.Cos(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedX);
+                play.StandardisedSpeedY =
+                    (float) (play.S * Math.Sin(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedY);
+
+                play.OrientationCos = (float) Math.Cos(play.Orientation / 360 * 2 * Math.PI);
+                play.OrientationSin = (float) Math.Sin(play.Orientation / 360 * 2 * Math.PI);
+                play.DirCos = (float) Math.Cos(play.Dir / 360 * 2 * Math.PI);
+                play.DirSin = (float) Math.Sin(play.Dir / 360 * 2 * Math.PI);
+
             }
 
             return rushingPlays;
@@ -171,12 +184,18 @@ namespace NFL.BigDataBowl.Services
             return (float) ((int) clock.Subtract(start).TotalSeconds / 60.0);
         }
 
-        private static int PlayerHeightInches(string feetInches)
+        private static float StandardiseDir(bool isLeft, float dir)
         {
-            const int inchesToFeet = 12;
-            var feet = feetInches.Split("-");
+            float standardisedDir;
+            if (isLeft && dir < 90)
+                standardisedDir = dir + 360;
+            else if (!isLeft && dir > 270)
+                standardisedDir = dir - 360;
+            else
+                standardisedDir = dir;
 
-            return StringParser.ToInt(feet[0]) * inchesToFeet + StringParser.ToInt(feet[1]);
+            // When the offense is moving left minus 180 from the standardised direction
+            return isLeft ? standardisedDir - 180 : standardisedDir;
         }
 
         public Task StopAsync(CancellationToken token)

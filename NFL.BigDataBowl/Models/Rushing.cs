@@ -53,15 +53,25 @@ namespace NFL.BigDataBowl.Models
         public long Humidity { get; set; }
         public string WindSpeed { get; set; }
         public string WindDirection { get; set; }
+
+        // Newly created fields for analysis
         public bool IsLeftDirection { get; set; }
         public bool IsBallCarrier { get; set; }
-        public float MinutesRemainingInQuarter { get; set; }
-        public int PlayerHeightInches { get; set; }
-        public int TimeDelta { get; set; }
-        public float TransformedX { get; set; }
-        public float TransformedY { get; set; }
-        public string TeamOnOffense { get; set; }
         public bool IsOnOffense { get; set; }
+        public string TeamOnOffense { get; set; }
+        public float MinutesRemainingInQuarter { get; set; }
+        public int TimeDelta { get; set; }
         public int YardsFromOwnGoal { get; set; }
+        public float StandardisedX { get; set; }
+        public float StandardisedY { get; set; }
+        public float StandardisedDir { get; set; }
+        public float StandardisedSpeedX { get; set; }
+        public float StandardisedSpeedY { get; set; }
+        public int StandardisedYardLine { get; set; }
+        public float StandardisedOrientation { get; set; }
+        public float OrientationSin { get; set; }
+        public float OrientationCos { get; set; }
+        public float DirSin { get; set; }
+        public float DirCos { get; set; }
     }
 }
