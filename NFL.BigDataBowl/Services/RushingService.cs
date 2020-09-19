@@ -14,7 +14,7 @@ namespace NFL.BigDataBowl.Services
     public class RushingService : IHostedService
     {
         private static ILogger _logger;
-        private static readonly string RelativePath = @"../../../../Data/train.csv";
+        private const string RelativePath = @"../../../../Data/train.csv";
         private static readonly string DataPath = CsvReader.GetAbsolutePath(RelativePath);
 
         public RushingService(ILogger<TrackingService> logger, IHostApplicationLifetime appLifetime)
@@ -28,11 +28,11 @@ namespace NFL.BigDataBowl.Services
 
         public async Task StartAsync(CancellationToken token)
         {
-            var rushingPlays = ReadTracking();
+            var rushingPlays = ReadTracking().ToList();
 
         }
 
-        private static IList<Rushing> ReadTracking()
+        private static IEnumerable<Rushing> ReadTracking()
         {
             var rushingPlays = new List<Rushing>();
             const string GameClockFormat = "HH:mm:ss";
@@ -112,7 +112,7 @@ namespace NFL.BigDataBowl.Services
 
             _logger.LogInformation($"Total rows: {rushingPlays.Count}");
 
-            return PreProcess(rushingPlays).ToList();
+            return PreProcess(rushingPlays);
         }
 
         private static IEnumerable<Rushing> PreProcess(IList<Rushing> rushingPlays)
