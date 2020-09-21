@@ -30,14 +30,14 @@ namespace NFL.BigDataBowl.Services
         {
             var rawPlays = ReadTracking();
             var preProcessedPlays = PreProcess(rawPlays).ToList();
-            var relativePlays = RelativeFeatures(preProcessedPlays);
 
+            var rushingMetrics = RusherRelativeMetrics(preProcessedPlays);
+
+            // Features; 'GameId', 'PlayId', 'Season', 'Yards'
             var rushingFeatures =
-                rawPlays.GroupBy(x => new ModelFeatures
+                rawPlays.GroupBy(x => new PlayMeta
                         {GameId = x.GameId, Season = x.Season, Yards = x.Yards, PlayId = x.PlayId})
                     .Select(x => x.Key).ToList();
-            
-            
         }
 
         private static IList<RushingRaw> ReadTracking()
@@ -123,34 +123,36 @@ namespace NFL.BigDataBowl.Services
             return rushingPlays;
         }
 
-        private static IEnumerable<RushingRaw> RelativeFeatures(IList<RushingRaw> plays)
+        private static IEnumerable<PlayMetrics> RusherRelativeMetrics(IList<RushingRaw> plays)
         {
-            // Features; 'GameId', 'PlayId', 'Season', 'Yards'
-            var defense = plays.Where(x => !x.IsOnOffense).ToList();
             var rushers = plays.Where(x => x.IsBallCarrier).ToList();
+            var modelPlays = new List<PlayMetrics>();
 
-            foreach (var player in defense)
+            foreach (var player in plays)
             {
-                var rusherX = rushers.Where(x => x.PlayId == player.PlayId)
-                    .Select(x => x.StandardisedX).First();
+                var currentPlayId = player.PlayId;
+                var playRusher = rushers.Where(x => x.PlayId == currentPlayId).ToList();
+                var rusherX = playRusher.Select(x => x.StandardisedX).First();
+                var rusherY = playRusher.Select(x => x.StandardisedY).First();
+                var rusherSpeedX = playRusher.Select(x => x.StandardisedSpeedX).First();
+                var rusherSpeedY = playRusher.Select(x => x.StandardisedSpeedY).First();
 
-                var rusherY = rushers.Where(x => x.PlayId == player.PlayId)
-                        .Select(x => x.StandardisedY).First();
-
-                var rusherSpeedX = rushers.Where(x => x.PlayId == player.PlayId)
-                        .Select(x => x.StandardisedSpeedX).First();
-
-                var rusherSpeedY = rushers.Where(x => x.PlayId == player.PlayId)
-                        .Select(x => x.StandardisedSpeedY).First();
-
-                player.RelativeX = player.StandardisedX - rusherX;
-                player.RelativeY = player.StandardisedY - rusherY;
-                player.RelativeSpeedX = player.StandardisedSpeedX - rusherSpeedX;
-                player.RelativeSpeedY = player.StandardisedSpeedY - rusherSpeedY;
-
+                modelPlays.Add(new PlayMetrics
+                {
+                    Quarter = player.Quarter,
+                    Down = player.Down,
+                    MinutesRemainingInQuarter = player.MinutesRemainingInQuarter,
+                    StandardisedX = player.StandardisedX,
+                    StandardisedY = player.StandardisedY,
+                    StandardisedDir = player.StandardisedDir,
+                    RelativeX = player.StandardisedX - rusherX,
+                    RelativeY = player.StandardisedY - rusherY,
+                    RelativeSpeedX = player.StandardisedSpeedX - rusherSpeedX,
+                    RelativeSpeedY = player.StandardisedSpeedY - rusherSpeedY
+                });
             }
 
-            return null;
+            return modelPlays;
         }
 
         private static IEnumerable<RushingRaw> PreProcess(IList<RushingRaw> rushingPlays)

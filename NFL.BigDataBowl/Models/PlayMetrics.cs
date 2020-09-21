@@ -1,6 +1,6 @@
 namespace NFL.BigDataBowl.Models
 {
-    public class ModelPlays
+    public class PlayMetrics
     {
         public int Quarter { get; set; }
         public int Down { get; set; }

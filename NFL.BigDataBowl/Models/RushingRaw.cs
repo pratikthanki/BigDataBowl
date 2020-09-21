@@ -54,7 +54,7 @@ namespace NFL.BigDataBowl.Models
         public string WindSpeed { get; set; }
         public string WindDirection { get; set; }
 
-        // Newly created fields for analysis
+        // Flip location/tracking data so all plays appears as going from left to right
         public bool IsLeftDirection { get; set; }
         public bool IsBallCarrier { get; set; }
         public bool IsOnOffense { get; set; }
@@ -70,11 +70,5 @@ namespace NFL.BigDataBowl.Models
         public float StandardisedSpeedY { get; set; }
         public int StandardisedYardLine { get; set; }
         public float StandardisedOrientation { get; set; }
-
-        // Record rusher positions relative to the defense
-        public float RelativeX { get; set; }
-        public float RelativeY { get; set; }
-        public float RelativeSpeedX { get; set; }
-        public float RelativeSpeedY { get; set; }
     }
 }
