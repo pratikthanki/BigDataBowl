@@ -117,19 +117,7 @@ namespace NFL.BigDataBowl.Services
 
         private static IEnumerable<Rushing> PreProcess(IList<Rushing> rushingPlays)
         {
-            var homeTeams =
-                rushingPlays.Select(x => x.HomeTeamAbbr).Distinct().OrderBy(x => x).ToList();
-
-            var possessionTeams =
-                rushingPlays.Select(x => x.PossessionTeam).Distinct().OrderBy(x => x).ToList();
-
-            var teamMap = homeTeams
-                .Zip(possessionTeams, (k, v) => new {k, v})
-                .Where(x => x.k != x.v)
-                .ToDictionary(x => x.k, x => x.v);
-
-            foreach (var team in possessionTeams)
-                teamMap[team] = team;
+            var teamMap = BuildTeamMap(rushingPlays);
 
             foreach (var play in rushingPlays)
             {
@@ -173,6 +161,24 @@ namespace NFL.BigDataBowl.Services
             }
 
             return rushingPlays;
+        }
+
+        private static Dictionary<string, string> BuildTeamMap(IList<Rushing> rushingPlays)
+        {
+            var homeTeams =
+                rushingPlays.Select(x => x.HomeTeamAbbr).Distinct().OrderBy(x => x).ToList();
+
+            var possessionTeams =
+                rushingPlays.Select(x => x.PossessionTeam).Distinct().OrderBy(x => x).ToList();
+
+            var teamMap = homeTeams
+                .Zip(possessionTeams, (k, v) => new {k, v})
+                .Where(x => x.k != x.v)
+                .ToDictionary(x => x.k, x => x.v);
+
+            foreach (var team in possessionTeams)
+                teamMap[team] = team;
+            return teamMap;
         }
 
         private static float MinutesRemaining(DateTime gameClock)
