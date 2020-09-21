@@ -28,13 +28,21 @@ namespace NFL.BigDataBowl.Services
 
         public async Task StartAsync(CancellationToken token)
         {
-            var rushingPlays = ReadTracking().ToList();
+            var rawPlays = ReadTracking();
+            var preProcessedPlays = PreProcess(rawPlays).ToList();
+            var relativePlays = RelativeFeatures(preProcessedPlays);
 
+            var rushingFeatures =
+                rawPlays.GroupBy(x => new ModelFeatures
+                        {GameId = x.GameId, Season = x.Season, Yards = x.Yards, PlayId = x.PlayId})
+                    .Select(x => x.Key).ToList();
+            
+            
         }
 
-        private static IEnumerable<Rushing> ReadTracking()
+        private static IList<RushingRaw> ReadTracking()
         {
-            var rushingPlays = new List<Rushing>();
+            var rushingPlays = new List<RushingRaw>();
             const string GameClockFormat = "HH:mm:ss";
             const string TimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
             const string BirthDateFormat = "MM/dd/yyyy";
@@ -51,7 +59,7 @@ namespace NFL.BigDataBowl.Services
             while (!parser.EndOfData)
             {
                 var fields = parser.ReadFields();
-                var play = new Rushing
+                var play = new RushingRaw
                 {
                     GameId = StringParser.ToLong(fields[0]),
                     PlayId = StringParser.ToLong(fields[1]),
@@ -112,10 +120,40 @@ namespace NFL.BigDataBowl.Services
 
             _logger.LogInformation($"Total rows: {rushingPlays.Count}");
 
-            return PreProcess(rushingPlays);
+            return rushingPlays;
         }
 
-        private static IEnumerable<Rushing> PreProcess(IList<Rushing> rushingPlays)
+        private static IEnumerable<RushingRaw> RelativeFeatures(IList<RushingRaw> plays)
+        {
+            // Features; 'GameId', 'PlayId', 'Season', 'Yards'
+            var defense = plays.Where(x => !x.IsOnOffense).ToList();
+            var rushers = plays.Where(x => x.IsBallCarrier).ToList();
+
+            foreach (var player in defense)
+            {
+                var rusherX = rushers.Where(x => x.PlayId == player.PlayId)
+                    .Select(x => x.StandardisedX).First();
+
+                var rusherY = rushers.Where(x => x.PlayId == player.PlayId)
+                        .Select(x => x.StandardisedY).First();
+
+                var rusherSpeedX = rushers.Where(x => x.PlayId == player.PlayId)
+                        .Select(x => x.StandardisedSpeedX).First();
+
+                var rusherSpeedY = rushers.Where(x => x.PlayId == player.PlayId)
+                        .Select(x => x.StandardisedSpeedY).First();
+
+                player.RelativeX = player.StandardisedX - rusherX;
+                player.RelativeY = player.StandardisedY - rusherY;
+                player.RelativeSpeedX = player.StandardisedSpeedX - rusherSpeedX;
+                player.RelativeSpeedY = player.StandardisedSpeedY - rusherSpeedY;
+
+            }
+
+            return null;
+        }
+
+        private static IEnumerable<RushingRaw> PreProcess(IList<RushingRaw> rushingPlays)
         {
             var teamMap = BuildTeamMap(rushingPlays);
 
@@ -132,6 +170,9 @@ namespace NFL.BigDataBowl.Services
                 play.IsOnOffense = play.Team == play.TeamOnOffense;
                 play.IsLeftDirection = play.PlayDirection == "left";
                 play.IsBallCarrier = play.NflId == play.NflIdRusher;
+                play.IsLeading = play.TeamOnOffense == "home"
+                    ? play.HomeScoreBeforePlay > play.VisitorScoreBeforePlay
+                    : play.HomeScoreBeforePlay < play.VisitorScoreBeforePlay;
 
                 play.MinutesRemainingInQuarter = MinutesRemaining(play.GameClock);
                 play.TimeDelta = (int) play.TimeHandoff.Subtract(play.TimeSnap).TotalSeconds;
@@ -140,30 +181,25 @@ namespace NFL.BigDataBowl.Services
                     ? play.YardLine == 50 ? 50 : play.YardLine
                     : 50 + (50 - play.YardLine);
 
-                // Standardise location metrics so offense is heading right, otherwise rotate
+                // Standardise location so offense is heading right and speed metrics into radians 
                 play.StandardisedYardLine =
                     play.FieldPosition == play.PossessionTeam ? play.YardLine : 100 - play.YardLine;
+
+                play.StandardisedOrientation = play.IsLeftDirection ? (180 + play.Orientation) % 360 : play.Orientation;
+                play.StandardisedDir = StandardiseDir(play.IsLeftDirection, play.Dir);
+
                 play.StandardisedX = play.IsLeftDirection ? 120 - play.X : play.X;
                 play.StandardisedY = (float) (play.IsLeftDirection ? 160 / 3.0 - play.Y : play.Y);
-                play.StandardisedOrientation = play.IsLeftDirection ? (180 + play.Orientation) % 360 : play.Orientation;
-                play.StandardisedDir = play.IsLeftDirection ? (180 + play.Dir) % 360 : play.Dir;
-                
                 play.StandardisedSpeedX =
                     (float) (play.S * Math.Cos(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedX);
                 play.StandardisedSpeedY =
                     (float) (play.S * Math.Sin(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedY);
-
-                play.OrientationCos = (float) Math.Cos(play.Orientation / 360 * 2 * Math.PI);
-                play.OrientationSin = (float) Math.Sin(play.Orientation / 360 * 2 * Math.PI);
-                play.DirCos = (float) Math.Cos(play.Dir / 360 * 2 * Math.PI);
-                play.DirSin = (float) Math.Sin(play.Dir / 360 * 2 * Math.PI);
-
             }
 
             return rushingPlays;
         }
 
-        private static Dictionary<string, string> BuildTeamMap(IList<Rushing> rushingPlays)
+        private static Dictionary<string, string> BuildTeamMap(IList<RushingRaw> rushingPlays)
         {
             var homeTeams =
                 rushingPlays.Select(x => x.HomeTeamAbbr).Distinct().OrderBy(x => x).ToList();

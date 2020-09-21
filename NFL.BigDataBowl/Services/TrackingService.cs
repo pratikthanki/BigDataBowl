@@ -85,9 +85,9 @@ namespace NFL.BigDataBowl.Services
             return Tracking;
         }
 
-        private async Task<List<Plays>> ReadPlays()
+        private async Task<List<Play>> ReadPlays()
         {
-            var Plays = new List<Plays>();
+            var Plays = new List<Play>();
             
             Logger.LogInformation($"Reading from path: {PlaysPath}");
             var plays = await CsvReader.RequestCsv(PlaysPath);
@@ -102,7 +102,7 @@ namespace NFL.BigDataBowl.Services
                 if (rowSplit[0] != GameId)
                     continue;
 
-                Plays.Add(new Plays
+                Plays.Add(new Play
                 {
                     GameId = Convert.ToInt64(rowSplit[0]),
                     PlayId = Convert.ToInt64(rowSplit[1]),
@@ -134,7 +134,7 @@ namespace NFL.BigDataBowl.Services
                 });
             }
 
-            Logger.LogInformation($"Plays data parsed: {Plays.Count}");
+            Logger.LogInformation($"Play data parsed: {Plays.Count}");
             return Plays;
         }
     }

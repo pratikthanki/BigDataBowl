@@ -13,7 +13,7 @@ namespace NFL.BigDataBowl
             mlContext = new MLContext();
         }
         
-        public ITransformer BuildModel(IEnumerable<Rushing> plays)
+        public ITransformer BuildModel(IEnumerable<RushingRaw> plays)
         {
             var dataView = mlContext.Data.LoadFromEnumerable(plays);
 
@@ -35,8 +35,8 @@ namespace NFL.BigDataBowl
                 .CopyColumns("xYards", null)
                 .Append(mlContext.Transforms.Concatenate(
                     "Features",
-                    nameof(Rushing.GameId), nameof(Rushing.PlayId), nameof(Rushing.Season), 
-                    nameof(Rushing.Yards)));
+                    nameof(RushingRaw.GameId), nameof(RushingRaw.PlayId), nameof(RushingRaw.Season), 
+                    nameof(RushingRaw.Yards)));
             
             return null;
         }

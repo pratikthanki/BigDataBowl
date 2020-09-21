@@ -1,7 +1,7 @@
 ﻿
 namespace NFL.BigDataBowl.Models
 {
-    public class Games
+    public class Game
     {
         public int Season { get; set; }
         public int Week { get; set; }

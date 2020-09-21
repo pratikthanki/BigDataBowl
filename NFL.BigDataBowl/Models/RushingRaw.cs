@@ -2,7 +2,7 @@ using System;
 
 namespace NFL.BigDataBowl.Models
 {
-    public class Rushing
+    public class RushingRaw
     {
         public long GameId { get; set; }
         public long PlayId { get; set; }
@@ -58,6 +58,7 @@ namespace NFL.BigDataBowl.Models
         public bool IsLeftDirection { get; set; }
         public bool IsBallCarrier { get; set; }
         public bool IsOnOffense { get; set; }
+        public bool IsLeading { get; set; }
         public string TeamOnOffense { get; set; }
         public float MinutesRemainingInQuarter { get; set; }
         public int TimeDelta { get; set; }
@@ -69,9 +70,11 @@ namespace NFL.BigDataBowl.Models
         public float StandardisedSpeedY { get; set; }
         public int StandardisedYardLine { get; set; }
         public float StandardisedOrientation { get; set; }
-        public float OrientationSin { get; set; }
-        public float OrientationCos { get; set; }
-        public float DirSin { get; set; }
-        public float DirCos { get; set; }
+
+        // Record rusher positions relative to the defense
+        public float RelativeX { get; set; }
+        public float RelativeY { get; set; }
+        public float RelativeSpeedX { get; set; }
+        public float RelativeSpeedY { get; set; }
     }
 }
