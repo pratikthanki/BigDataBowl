@@ -28,7 +28,7 @@ namespace NFL.BigDataBowl
             return trainedModel;
         }
 
-        private ITransformer Train(IDataView trainData)
+        private static ITransformer Train(IDataView trainData)
         {
             // Play features; GameId, PlayId, Season, Yards
             var trainingPipeline = mlContext.Transforms

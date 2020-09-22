@@ -17,4 +17,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00839" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00880" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MLModels" />
+  </ItemGroup>
 </Project>
