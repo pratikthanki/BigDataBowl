@@ -1,6 +1,6 @@
 namespace NFL.BigDataBowl.Models
 {
-    public class PlayMeta
+    public class PlayMetadata
     {
         public long GameId { get; set; }
         public long PlayId { get; set; }
