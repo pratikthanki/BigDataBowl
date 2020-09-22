@@ -156,7 +156,7 @@ namespace NFL.BigDataBowl
                 play.IsOnOffense = play.Team == play.TeamOnOffense;
                 play.IsLeftDirection = play.PlayDirection == "left";
                 play.IsBallCarrier = play.NflId == play.NflIdRusher;
-                play.IsLeading = play.TeamOnOffense == "home"
+                play.IsOffenseLeading = play.TeamOnOffense == "home"
                     ? play.HomeScoreBeforePlay > play.VisitorScoreBeforePlay
                     : play.HomeScoreBeforePlay < play.VisitorScoreBeforePlay;
 

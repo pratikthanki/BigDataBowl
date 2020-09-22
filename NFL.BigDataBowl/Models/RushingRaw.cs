@@ -58,7 +58,7 @@ namespace NFL.BigDataBowl.Models
         public bool IsLeftDirection { get; set; }
         public bool IsBallCarrier { get; set; }
         public bool IsOnOffense { get; set; }
-        public bool IsLeading { get; set; }
+        public bool IsOffenseLeading { get; set; }
         public string TeamOnOffense { get; set; }
         public float MinutesRemainingInQuarter { get; set; }
         public int TimeDelta { get; set; }
