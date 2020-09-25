@@ -4,9 +4,8 @@ using System.Threading;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms;
-using NFL.BigDataBowl.Models;
+using NFL.BigDataBowl.DataModels;
 using NFL.BigDataBowl.Utilities;
-using NumSharp.Extensions;
 
 namespace NFL.BigDataBowl.MLModels
 {
@@ -86,9 +85,7 @@ namespace NFL.BigDataBowl.MLModels
                     nameof(PlayMetrics.RelativeSpeedY)))
                 .Append(mlContext.Model
                     .LoadTensorFlowModel(tensorFlowModelFilePath)
-                    .ScoreTensorFlowModel(nameof(ExpectedYardsPrediction.RegScores),
-                        "X",
-                        addBatchDimensionInput: false));
+                    .ScoreTensorFlowModel(nameof(ExpectedYardsPrediction.RegScores), "X", false));
 
             var trainedModel = trainingPipeline.Fit(trainData);
             var predictionFunction =
