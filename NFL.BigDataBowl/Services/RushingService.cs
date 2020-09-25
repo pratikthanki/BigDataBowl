@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NFL.BigDataBowl.MLModels;
-using NFL.BigDataBowl.Models;
 
 namespace NFL.BigDataBowl.Services
 {
@@ -13,9 +12,10 @@ namespace NFL.BigDataBowl.Services
     {
         private static ILogger _logger;
         private readonly CancellationTokenSource _cancellationTokenSource;
+        private Task _task;
         private static DataTransformer _transformer;
 
-        public RushingService(ILogger<TrackingService> logger, IHostApplicationLifetime appLifetime)
+        public RushingService(ILogger<RushingService> logger, IHostApplicationLifetime appLifetime)
         {
             _logger = logger;
             _transformer = new DataTransformer(_logger);
@@ -25,34 +25,49 @@ namespace NFL.BigDataBowl.Services
 
             _cancellationTokenSource.Token.Register(() =>
             {
-                _logger.LogInformation("Shutting down..");
+                _logger.LogInformation($"Shutting down {nameof(RushingService)}..");
                 appLifetime.StopApplication();
             });
         }
 
-        public async Task StartAsync(CancellationToken token)
+        public Task StartAsync(CancellationToken token)
+        {
+            _logger.LogInformation($"Starting {nameof(RushingService)}..");
+
+            if (_task != null)
+                throw new InvalidOperationException();
+
+            if (!_cancellationTokenSource.IsCancellationRequested)
+                _task = Task.Run(RunRushingService, token);
+
+            _logger.LogInformation($"Starting {nameof(RushingService)}..");
+
+            return Task.CompletedTask;
+        }
+
+        private async Task RunRushingService()
         {
             var rawPlays = _transformer.ReadTracking();
-            var preProcessedPlays = _transformer.PreProcess(rawPlays);
-            var rushingMetrics = _transformer.RusherRelativeMetrics(preProcessedPlays);
+            var rushingMetrics = _transformer.PreProcess(rawPlays);
 
             // metrics for each player by features
             var playerMetricsPerPlay = rushingMetrics
                 .GroupBy(x => (x.GameId, x.Season, x.PlayId, x.Yards))
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            var rushingPlayFeatures =
-                rushingMetrics
-                    .Select(x => new PlayMetadata
-                        {GameId = x.GameId, Season = x.Season, Yards = x.Yards, PlayId = x.PlayId})
-                    .ToList();
-
             ModelConfigurator.Run(playerMetricsPerPlay, _cancellationTokenSource.Token);
         }
 
-        public Task StopAsync(CancellationToken token)
+        public async Task StopAsync(CancellationToken token)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Stopping {nameof(RushingService)}..");
+
+            _cancellationTokenSource.Cancel();
+            var runningTask = Interlocked.Exchange(ref _task, null);
+            if (runningTask != null)
+                await runningTask;
+
+            _logger.LogInformation($"Stopped {nameof(RushingService)}..");
         }
     }
 }
