@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
-using NFL.BigDataBowl.Models;
+using NFL.BigDataBowl.DataModels;
+using NFL.BigDataBowl.Services;
 using NFL.BigDataBowl.Utilities;
 
 namespace NFL.BigDataBowl
@@ -13,7 +15,7 @@ namespace NFL.BigDataBowl
         private static ILogger _logger;
         private const string RelativePath = @"../../../../Data/train.csv";
         private static readonly string DataPath = CsvReader.GetAbsolutePath(RelativePath);
-        
+
         public DataTransformer(ILogger logger)
         {
             _logger = logger;
@@ -21,6 +23,8 @@ namespace NFL.BigDataBowl
 
         public IList<RushingRaw> ReadTracking()
         {
+            _logger.LogInformation($"Starting {nameof(ReadTracking)}");
+
             var rushingPlays = new List<RushingRaw>();
             const string GameClockFormat = "HH:mm:ss";
             const string TimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
@@ -90,6 +94,26 @@ namespace NFL.BigDataBowl
                     WindSpeed = fields[47],
                     WindDirection = fields[48]
                 };
+                
+                play.IsLeftDirection = play.PlayDirection == "left";
+                play.IsBallCarrier = play.NflId == play.NflIdRusher;
+                play.IsOffenseLeading = play.TeamOnOffense == "home"
+                    ? play.HomeScoreBeforePlay > play.VisitorScoreBeforePlay
+                    : play.HomeScoreBeforePlay < play.VisitorScoreBeforePlay;
+
+                play.MinutesRemainingInQuarter = MinutesRemaining(play.GameClock);
+                play.TimeDelta = (int) play.TimeHandoff.Subtract(play.TimeSnap).TotalSeconds;
+                
+                // Standardise location so offense is heading right and speed metrics into radians 
+                play.StandardisedOrientation = play.IsLeftDirection ? (180 + play.Orientation) % 360 : play.Orientation;
+                play.StandardisedDir = StandardiseDir(play.IsLeftDirection, play.Dir);
+
+                play.StandardisedX = play.IsLeftDirection ? 120 - play.X : play.X;
+                play.StandardisedY = (float) (play.IsLeftDirection ? 160 / 3.0 - play.Y : play.Y);
+                play.StandardisedSpeedX =
+                    (float) (play.S * Math.Cos(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedX);
+                play.StandardisedSpeedY =
+                    (float) (play.S * Math.Sin(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedY);
 
                 rushingPlays.Add(play);
 
@@ -102,50 +126,13 @@ namespace NFL.BigDataBowl
             return rushingPlays;
         }
 
-        public IList<PlayMetrics> RusherRelativeMetrics(IList<RushingRaw> plays)
+        public IList<PlayMetrics> PreProcess(IList<RushingRaw> rushingPlays)
         {
-            var rushers = plays.Where(x => x.IsBallCarrier).ToList();
-            var modelPlays = new List<PlayMetrics>();
+            _logger.LogInformation($"Starting {nameof(PreProcess)}");
 
-            foreach (var player in plays)
-            {
-                var currentPlayId = player.PlayId;
-                var playRusher = rushers.Where(x => x.PlayId == currentPlayId).ToList();
-                var rusherX = playRusher.Select(x => x.StandardisedX).First();
-                var rusherY = playRusher.Select(x => x.StandardisedY).First();
-                var rusherSpeedX = playRusher.Select(x => x.StandardisedSpeedX).First();
-                var rusherSpeedY = playRusher.Select(x => x.StandardisedSpeedY).First();
-
-                modelPlays.Add(new PlayMetrics
-                {
-                    NflId = player.NflId,
-                    GameId = player.GameId,
-                    Season = player.Season,
-                    Yards = player.Yards,
-                    PlayId = player.PlayId,
-                    Quarter = player.Quarter,
-                    Down = player.Down,
-                    MinutesRemainingInQuarter = player.MinutesRemainingInQuarter,
-                    YardsFromOwnGoal = player.YardsFromOwnGoal,
-                    IsOffenseLeading = player.IsOffenseLeading,
-                    StandardisedX = player.StandardisedX,
-                    StandardisedY = player.StandardisedY,
-                    StandardisedDir = player.StandardisedDir,
-                    RelativeX = player.StandardisedX - rusherX,
-                    RelativeY = player.StandardisedY - rusherY,
-                    RelativeSpeedX = player.StandardisedSpeedX - rusherSpeedX,
-                    RelativeSpeedY = player.StandardisedSpeedY - rusherSpeedY
-                });
-            }
-
-            _logger.LogInformation("Relative metrics generated");
-
-            return modelPlays;
-        }
-
-        public IList<RushingRaw> PreProcess(IList<RushingRaw> rushingPlays)
-        {
             var teamMap = BuildTeamMap(rushingPlays);
+            var rushers = rushingPlays.Where(x => x.IsBallCarrier).ToList();
+            var modelPlays = new List<PlayMetrics>();
 
             foreach (var play in rushingPlays)
             {
@@ -158,36 +145,43 @@ namespace NFL.BigDataBowl
                 // New bool columns 
                 play.TeamOnOffense = play.PossessionTeam == play.HomeTeamAbbr ? "home" : "away";
                 play.IsOnOffense = play.Team == play.TeamOnOffense;
-                play.IsLeftDirection = play.PlayDirection == "left";
-                play.IsBallCarrier = play.NflId == play.NflIdRusher;
-                play.IsOffenseLeading = play.TeamOnOffense == "home"
-                    ? play.HomeScoreBeforePlay > play.VisitorScoreBeforePlay
-                    : play.HomeScoreBeforePlay < play.VisitorScoreBeforePlay;
-
-                play.MinutesRemainingInQuarter = MinutesRemaining(play.GameClock);
-                play.TimeDelta = (int) play.TimeHandoff.Subtract(play.TimeSnap).TotalSeconds;
 
                 play.YardsFromOwnGoal = play.FieldPosition == play.PossessionTeam
                     ? play.YardLine == 50 ? 50 : play.YardLine
                     : 50 + (50 - play.YardLine);
 
-                // Standardise location so offense is heading right and speed metrics into radians 
                 play.StandardisedYardLine =
                     play.FieldPosition == play.PossessionTeam ? play.YardLine : 100 - play.YardLine;
 
-                play.StandardisedOrientation = play.IsLeftDirection ? (180 + play.Orientation) % 360 : play.Orientation;
-                play.StandardisedDir = StandardiseDir(play.IsLeftDirection, play.Dir);
+                var rusher = rushers.First(x => x.PlayId == play.PlayId);
 
-                play.StandardisedX = play.IsLeftDirection ? 120 - play.X : play.X;
-                play.StandardisedY = (float) (play.IsLeftDirection ? 160 / 3.0 - play.Y : play.Y);
-                play.StandardisedSpeedX =
-                    (float) (play.S * Math.Cos(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedX);
-                play.StandardisedSpeedY =
-                    (float) (play.S * Math.Sin(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedY);
+                modelPlays.Add(new PlayMetrics
+                {
+                    NflId = play.NflId,
+                    GameId = play.GameId,
+                    Season = play.Season,
+                    Yards = play.Yards,
+                    PlayId = play.PlayId,
+                    Quarter = play.Quarter,
+                    Down = play.Down,
+                    MinutesRemainingInQuarter = play.MinutesRemainingInQuarter,
+                    YardsFromOwnGoal = play.YardsFromOwnGoal,
+                    IsOffenseLeading = play.IsOffenseLeading,
+                    StandardisedX = play.StandardisedX,
+                    StandardisedY = play.StandardisedY,
+                    StandardisedDir = play.StandardisedDir,
+                    RelativeX = play.StandardisedX - rusher.StandardisedX,
+                    RelativeY = play.StandardisedY - rusher.StandardisedY,
+                    RelativeSpeedX = play.StandardisedSpeedX - rusher.StandardisedSpeedX,
+                    RelativeSpeedY = play.StandardisedSpeedY - rusher.StandardisedSpeedY
+                });
+                
+                if (modelPlays.Count % 50_000 == 0)
+                    _logger.LogInformation($"Rows processed: {modelPlays.Count}");
             }
 
-            _logger.LogInformation("Data pre-processed");
-            return rushingPlays;
+            _logger.LogInformation($"Ending {nameof(PreProcess)}");
+            return modelPlays;
         }
 
         private static Dictionary<string, string> BuildTeamMap(IList<RushingRaw> rushingPlays)

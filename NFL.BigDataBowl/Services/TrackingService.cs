@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
-using NFL.BigDataBowl.Models;
+using NFL.BigDataBowl.DataModels;
 using NFL.BigDataBowl.Utilities;
 
 namespace NFL.BigDataBowl.Services
@@ -88,7 +88,7 @@ namespace NFL.BigDataBowl.Services
         private async Task<List<Play>> ReadPlays()
         {
             var Plays = new List<Play>();
-            
+
             Logger.LogInformation($"Reading from path: {PlaysPath}");
             var plays = await CsvReader.RequestCsv(PlaysPath);
 
