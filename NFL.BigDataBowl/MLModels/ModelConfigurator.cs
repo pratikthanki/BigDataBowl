@@ -13,7 +13,9 @@ namespace NFL.BigDataBowl.MLModels
     public class ModelConfigurator
     {
         private static MLContext mlContext;
-        private static readonly string tensorFlowModelFilePath = CsvReader.GetAbsolutePath(@"../../../MLModels/rushing_model");
+
+        private static readonly string tensorFlowModelFilePath =
+            CsvReader.GetAbsolutePath(@"../../../MLModels/rushing_model");
 
         public ITransformer Model { get; }
 
@@ -92,6 +94,25 @@ namespace NFL.BigDataBowl.MLModels
             var predictionFunction =
                 mlContext.Model.CreatePredictionEngine<PlayMetrics, ExpectedYardsPrediction>(trainedModel);
 
+            var predictions = trainedModel.Transform(testData);
+            var metrics = mlContext.Regression.Evaluate(predictions);
+
+            Console.WriteLine($"**ModelBuilder metrics**");
+            Console.WriteLine($"Loss Function            : {metrics.LossFunction:0.###}");
+            Console.WriteLine($"R Squared                : {metrics.RSquared:0.###}");
+            Console.WriteLine($"Mean Absolute Error      : {metrics.MeanAbsoluteError:0.###}");
+            Console.WriteLine($"Mean Squared Error       : {metrics.MeanSquaredError:0.###}");
+            Console.WriteLine($"Root Mean Squared Error  : {metrics.RootMeanSquaredError:0.###}");
+        }
+
+        private float[] PredictExpectedYards(
+            PredictionEngineBase<PlayMetrics, ExpectedYardsPrediction> predictionFunction,
+            PlayMetrics play)
+        {
+            var prediction = predictionFunction.Predict(play);
+            Console.WriteLine($"Expected Yards = {prediction.RegScores}");
+
+            return prediction.RegScores;
         }
     }
 

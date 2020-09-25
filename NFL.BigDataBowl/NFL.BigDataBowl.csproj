@@ -7,17 +7,16 @@
   <ItemGroup>
     <PackageReference Include="FileHelpers" Version="3.4.1" />
     <PackageReference Include="CsvHelper" Version="15.0.5" />
+    <PackageReference Include="Keras.NET" Version="3.8.4.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0-preview.3.20215.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-preview.3.20215.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-preview.3.20215.2" />
     <PackageReference Include="Microsoft.ML" Version="1.5.2" />
+    <PackageReference Include="Microsoft.ML.TensorFlow" Version="1.5.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Serilog" Version="2.9.1-dev-01177" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.1-dev-00940" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00839" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00880" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MLModels" />
   </ItemGroup>
 </Project>

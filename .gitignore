@@ -405,3 +405,4 @@ ASALocalRun/
 .localhistory/
 Data/BigDataBowl/train.csv
 Data/train.csv
+NFL.BigDataBowl/MLModels/TensorFlowModel

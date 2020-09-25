@@ -93,7 +93,7 @@ namespace NFL.BigDataBowl
 
                 rushingPlays.Add(play);
 
-                if (rushingPlays.Count % 10_000 == 0)
+                if (rushingPlays.Count % 50_000 == 0)
                     _logger.LogInformation($"Rows processed: {rushingPlays.Count}");
             }
 
@@ -102,7 +102,7 @@ namespace NFL.BigDataBowl
             return rushingPlays;
         }
 
-        public IEnumerable<PlayMetrics> RusherRelativeMetrics(IList<RushingRaw> plays)
+        public IList<PlayMetrics> RusherRelativeMetrics(IList<RushingRaw> plays)
         {
             var rushers = plays.Where(x => x.IsBallCarrier).ToList();
             var modelPlays = new List<PlayMetrics>();
@@ -118,6 +118,7 @@ namespace NFL.BigDataBowl
 
                 modelPlays.Add(new PlayMetrics
                 {
+                    NflId = player.NflId,
                     GameId = player.GameId,
                     Season = player.Season,
                     Yards = player.Yards,
@@ -126,6 +127,7 @@ namespace NFL.BigDataBowl
                     Down = player.Down,
                     MinutesRemainingInQuarter = player.MinutesRemainingInQuarter,
                     YardsFromOwnGoal = player.YardsFromOwnGoal,
+                    IsOffenseLeading = player.IsOffenseLeading,
                     StandardisedX = player.StandardisedX,
                     StandardisedY = player.StandardisedY,
                     StandardisedDir = player.StandardisedDir,
@@ -136,10 +138,12 @@ namespace NFL.BigDataBowl
                 });
             }
 
+            _logger.LogInformation("Relative metrics generated");
+
             return modelPlays;
         }
 
-        public IEnumerable<RushingRaw> PreProcess(IList<RushingRaw> rushingPlays)
+        public IList<RushingRaw> PreProcess(IList<RushingRaw> rushingPlays)
         {
             var teamMap = BuildTeamMap(rushingPlays);
 
@@ -149,7 +153,7 @@ namespace NFL.BigDataBowl
                 play.PossessionTeam = teamMap[play.PossessionTeam];
                 play.HomeTeamAbbr = teamMap[play.HomeTeamAbbr];
                 play.VisitorTeamAbbr = teamMap[play.VisitorTeamAbbr];
-                play.FieldPosition = teamMap[play.FieldPosition];
+                play.FieldPosition = play.FieldPosition == "" ? "50" : teamMap[play.FieldPosition];
 
                 // New bool columns 
                 play.TeamOnOffense = play.PossessionTeam == play.HomeTeamAbbr ? "home" : "away";
@@ -182,6 +186,7 @@ namespace NFL.BigDataBowl
                     (float) (play.S * Math.Sin(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedY);
             }
 
+            _logger.LogInformation("Data pre-processed");
             return rushingPlays;
         }
 
