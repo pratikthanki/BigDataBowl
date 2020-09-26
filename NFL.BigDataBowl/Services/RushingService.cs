@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -47,15 +46,7 @@ namespace NFL.BigDataBowl.Services
 
         private async Task RunRushingService()
         {
-            var rawPlays = _transformer.ReadTracking();
-            var rushingMetrics = _transformer.PreProcess(rawPlays);
-
-            // metrics for each player by features
-            var playerMetricsPerPlay = rushingMetrics
-                .GroupBy(x => (x.GameId, x.Season, x.PlayId, x.Yards))
-                .ToDictionary(g => g.Key, g => g.ToList());
-
-            ModelConfigurator.Run(playerMetricsPerPlay, _cancellationTokenSource.Token);
+            ModelConfigurator.Run(_transformer.ReadAndPreprocess(), _cancellationTokenSource.Token);
         }
 
         public async Task StopAsync(CancellationToken token)
