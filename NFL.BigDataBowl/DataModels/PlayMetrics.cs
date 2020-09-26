@@ -1,4 +1,6 @@
 
+using Microsoft.ML.Data;
+
 namespace NFL.BigDataBowl.DataModels
 {
     public class PlayMetrics
@@ -7,11 +9,11 @@ namespace NFL.BigDataBowl.DataModels
         public long GameId { get; set; }
         public long PlayId { get; set; }
         public int Season { get; set; }
-        public int Yards { get; set; }
+        [ColumnName("Label")] public float Yards { get; set; }
         public int Quarter { get; set; }
         public int Down { get; set; }
         public float MinutesRemainingInQuarter { get; set; }
-        public int YardsFromOwnGoal { get; set; }
+        public float YardsFromOwnGoal { get; set; }
         public bool IsOffenseLeading { get; set; }
         public float StandardisedX { get; set; }
         public float StandardisedY { get; set; }

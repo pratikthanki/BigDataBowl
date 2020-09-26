@@ -12,16 +12,8 @@ namespace NFL.BigDataBowl.MLModels
 {
     public class ModelConfigurator
     {
-        private static MLContext mlContext;
-
-        private static readonly string tensorFlowModelFilePath =
-            CsvReader.GetAbsolutePath(@"../../../MLModels/rushing_model");
-
-        public ITransformer Model { get; }
-
         public ModelConfigurator()
         {
-            mlContext = new MLContext();
         }
 
         public static void Run(IEnumerable<RushingRaw> rushingMetrics, CancellationToken cancellationToken)
@@ -52,7 +44,10 @@ namespace NFL.BigDataBowl.MLModels
                     RelativeY = x.RelativeY,
                     RelativeSpeedX = x.RelativeSpeedX,
                     RelativeSpeedY = x.RelativeSpeedY
-                }).ToList();
+                });
+
+            var mlContext = new MLContext();
+            var tensorFlowModelFilePath = CsvReader.GetAbsolutePath(@"../../../MLModels/TensorFlowModel");
 
             var data = mlContext.Data.LoadFromEnumerable(plays);
             var dataSplit = mlContext.Data.TrainTestSplit(data, 0.2);
@@ -60,25 +55,23 @@ namespace NFL.BigDataBowl.MLModels
             var trainData = dataSplit.TrainSet;
             var testData = dataSplit.TestSet;
 
-            static string AppendStringWithEncoded(string input)
+            string AppendStringWithEncoded(string input)
             {
                 return $"{input}Encoded";
             }
 
             OneHotEncodingEstimator OneHotEncode(string input)
             {
-                return mlContext.Transforms.Categorical.OneHotEncoding(
-                    AppendStringWithEncoded(input), input);
+                return mlContext.Transforms.Categorical.OneHotEncoding(AppendStringWithEncoded(input), input);
             }
 
-            static NormalizingEstimator Normalize(string input)
+            NormalizingEstimator Normalize(string input)
             {
                 return mlContext.Transforms.NormalizeMeanVariance(input, useCdf: false);
             }
 
-            var trainingPipeline = mlContext.Transforms
-                .CopyColumns("Y", nameof(PlayMetrics.Yards))
-                .Append(OneHotEncode(nameof(PlayMetrics.NflId)))
+            var trainingPipeline = mlContext.Transforms.Categorical
+                .OneHotEncoding(AppendStringWithEncoded(nameof(PlayMetrics.NflId)), nameof(PlayMetrics.NflId))
                 .Append(OneHotEncode(nameof(PlayMetrics.Season)))
                 .Append(OneHotEncode(nameof(PlayMetrics.Quarter)))
                 .Append(OneHotEncode(nameof(PlayMetrics.Down)))
@@ -92,7 +85,8 @@ namespace NFL.BigDataBowl.MLModels
                 .Append(Normalize(nameof(PlayMetrics.RelativeY)))
                 .Append(Normalize(nameof(PlayMetrics.RelativeSpeedX)))
                 .Append(Normalize(nameof(PlayMetrics.RelativeSpeedY)))
-                .Append(mlContext.Transforms.Concatenate("X",
+                .Append(mlContext.Transforms.Concatenate(
+                    "Features",
                     $"{AppendStringWithEncoded(nameof(PlayMetrics.NflId))}",
                     $"{AppendStringWithEncoded(nameof(PlayMetrics.Season))}",
                     $"{AppendStringWithEncoded(nameof(PlayMetrics.Quarter))}",
@@ -109,7 +103,7 @@ namespace NFL.BigDataBowl.MLModels
                     nameof(PlayMetrics.RelativeSpeedY)))
                 .Append(mlContext.Model
                     .LoadTensorFlowModel(tensorFlowModelFilePath)
-                    .ScoreTensorFlowModel(nameof(ExpectedYardsPrediction.RegScores), "X", false));
+                    .ScoreTensorFlowModel(nameof(ExpectedYardsPrediction.ExpectedYards), "X", false));
 
             var trainedModel = trainingPipeline.Fit(trainData);
             var predictionFunction =
@@ -126,19 +120,18 @@ namespace NFL.BigDataBowl.MLModels
             Console.WriteLine($"Root Mean Squared Error  : {metrics.RootMeanSquaredError:0.###}");
         }
 
-        private float[] PredictExpectedYards(
-            PredictionEngineBase<PlayMetrics, ExpectedYardsPrediction> predictionFunction,
-            PlayMetrics play)
+        private float PredictExpectedYards(
+            PredictionEngineBase<PlayMetrics, ExpectedYardsPrediction> predictionFunction, PlayMetrics play)
         {
             var prediction = predictionFunction.Predict(play);
-            Console.WriteLine($"Expected Yards = {prediction.RegScores}");
+            Console.WriteLine($"Expected Yards = {prediction.ExpectedYards}");
 
-            return prediction.RegScores;
+            return prediction.ExpectedYards;
         }
     }
 
     public class ExpectedYardsPrediction
     {
-        [VectorType(1)] public float[] RegScores;
+        [ColumnName("Score")] public float ExpectedYards;
     }
 }
