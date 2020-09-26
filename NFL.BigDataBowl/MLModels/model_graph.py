@@ -1,11 +1,11 @@
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
-f_size = 33
+f_size = 223
 num_output = 1
 tf.set_random_seed(1)
-X = tf.placeholder('float', [None, f_size], name="X")
-Y = tf.placeholder('float', [None, num_output], name="Y")
+X = tf.placeholder('float', [None, f_size], name="Features")
+Y = tf.placeholder('float', name="Label")
 lr = tf.placeholder(tf.float32, name="learning_rate")
 
 # Set model weights
@@ -23,4 +23,4 @@ init = tf.global_variables_initializer()
 # Launch the graph.
 with tf.Session() as sess:
     sess.run(init)
-    tf.saved_model.simple_save(sess, r'TensorFlowModel', inputs={'X': X, 'Y': Y}, outputs={'ExpectedYards': ExpectedYards})
+    tf.saved_model.simple_save(sess, r'TensorFlowModel', inputs={'Features': X, 'Label': Y}, outputs={'ExpectedYards': ExpectedYards})

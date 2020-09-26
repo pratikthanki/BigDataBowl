@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
 using NFL.BigDataBowl.DataModels;
-using NFL.BigDataBowl.Services;
 using NFL.BigDataBowl.Utilities;
 
 namespace NFL.BigDataBowl

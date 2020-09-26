@@ -49,7 +49,7 @@ namespace NFL.BigDataBowl.Services
             try
             {
                 var data = _transformer.ReadAndPreprocess();
-                ModelConfigurator.Run(data, _cancellationTokenSource.Token);
+                ModelConfigurator.Run(data);
             }
             catch (Exception exception)
             {
@@ -58,7 +58,7 @@ namespace NFL.BigDataBowl.Services
 
                 Environment.ExitCode = 1;
             }
-            
+
             _cancellationTokenSource.Cancel();
             Environment.ExitCode = 0;
         }
