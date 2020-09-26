@@ -21,7 +21,7 @@ namespace NFL.BigDataBowl
             _logger = logger;
         }
 
-        public IList<RushingRaw> ReadAndPreprocess()
+        public IEnumerable<RushingRaw> ReadAndPreprocess()
         {
             var rawCsv = ReadTracking();
 
@@ -127,6 +127,8 @@ namespace NFL.BigDataBowl
             }
 
             _logger.LogInformation($"Total rows: {rushingPlays.Count}");
+            
+            _logger.LogInformation($"Ending {nameof(PreProcess)}");
 
             return rushingPlays;
         }
@@ -136,12 +138,18 @@ namespace NFL.BigDataBowl
             _logger.LogInformation($"Starting {nameof(PreProcess)}");
 
             var teamMap = BuildTeamMap(rushingPlays);
-            var rushers = rushingPlays.Where(x => x.IsBallCarrier).ToList();
-            int count = 0;
+            var rushers = rushingPlays
+                .Where(x => x.IsBallCarrier)
+                .GroupBy(x => x.PlayId)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.First());
+
+            var count = 0;
 
             foreach (var play in rushingPlays)
             {
-                var rusher = rushers.First(x => x.PlayId == play.PlayId);
+                var rusher = rushers[play.PlayId];
 
                 // Ensure team names are consistent across all names
                 play.PossessionTeam = teamMap[play.PossessionTeam];
@@ -168,6 +176,8 @@ namespace NFL.BigDataBowl
                 count++;
                 ReportProgress(count);
             }
+            
+            _logger.LogInformation($"Total rows: {count}");
 
             _logger.LogInformation($"Ending {nameof(PreProcess)}");
             return rushingPlays;
@@ -181,11 +191,15 @@ namespace NFL.BigDataBowl
 
         private static Dictionary<string, string> BuildTeamMap(IList<RushingRaw> rushingPlays)
         {
-            var homeTeams =
-                rushingPlays.Select(x => x.HomeTeamAbbr).Distinct().OrderBy(x => x).ToList();
+            var homeTeams = rushingPlays
+                .GroupBy(x => x.HomeTeamAbbr)
+                .Select(x => x.Key)
+                .ToList();
 
-            var possessionTeams =
-                rushingPlays.Select(x => x.PossessionTeam).Distinct().OrderBy(x => x).ToList();
+            var possessionTeams = rushingPlays
+                .GroupBy(x => x.PossessionTeam)
+                .Select(x => x.Key)
+                .ToList();
 
             var teamMap = homeTeams
                 .Zip(possessionTeams, (k, v) => new {k, v})
