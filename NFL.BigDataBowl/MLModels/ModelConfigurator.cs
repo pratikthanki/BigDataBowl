@@ -238,8 +238,11 @@ namespace NFL.BigDataBowl.MLModels
             var tensorFlowModelFilePath = CsvReader.GetAbsolutePath(@"../../../MLModels/TensorFlowModel");
 
             var data = mlContext.Data.LoadFromEnumerable(plays);
-            var dataSplit = mlContext.Data.TrainTestSplit(data, 0.2);
+            var shuffledData = mlContext.Data.ShuffleRows(data);
+
+            var dataSplit = mlContext.Data.TrainTestSplit(shuffledData, 0.2);
             var trainData = dataSplit.TrainSet;
+            var testData = dataSplit.TestSet;
 
             string AppendStringWithEncoded(string input)
             {
@@ -257,7 +260,7 @@ namespace NFL.BigDataBowl.MLModels
             }
 
             var trainingPipeline = mlContext.Transforms
-                .CopyColumns("Label", nameof(ExpectedYardsPrediction.Yards))
+                .CopyColumns("xYards", nameof(ExpectedYardsPrediction.Yards))
                 .Append(OneHotEncode(nameof(PlayMetrics.Season)))
                 .Append(OneHotEncode(nameof(PlayMetrics.Quarter)))
                 .Append(OneHotEncode(nameof(PlayMetrics.Down)))
@@ -672,20 +675,18 @@ namespace NFL.BigDataBowl.MLModels
                 ))
                 .Append(mlContext.Model
                     .LoadTensorFlowModel(tensorFlowModelFilePath)
-                    .ScoreTensorFlowModel(
-                        new[] {"Label"},
-                        new[] {"Features"}, false));
+                    .ScoreTensorFlowModel(new[] {"xYards"}, new[] {"Features"}, false));
 
             var trainedModel = trainingPipeline.Fit(trainData);
 
-            var predictionFunction =
-                mlContext.Model.CreatePredictionEngine<PlayMetrics, ExpectedYardsPrediction>(trainedModel);
+            var predictionEngine = mlContext.Model.CreatePredictionEngine<PlayMetrics, ExpectedYardsPrediction>(trainedModel);
 
-            var testData = mlContext.Data.CreateEnumerable<PlayMetrics>(data, reuseRowObject: true);
+            var testPlays = 
+                mlContext.Data.CreateEnumerable<PlayMetrics>(testData, reuseRowObject: true);
 
-            foreach (var play in testData)
+            foreach (var play in testPlays)
             {
-                var xYards = predictionFunction.Predict(play);
+                var xYards = predictionEngine.Predict(play);
 
                 Console.WriteLine($"PlayId: {play.PlayId}; Predicted: {xYards.Yards}; Actual: {play.Yards}");
             }
