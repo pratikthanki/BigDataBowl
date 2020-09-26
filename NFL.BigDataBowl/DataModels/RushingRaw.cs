@@ -70,5 +70,9 @@ namespace NFL.BigDataBowl.DataModels
         public float StandardisedSpeedY { get; set; }
         public int StandardisedYardLine { get; set; }
         public float StandardisedOrientation { get; set; }
+        public float RelativeX { get; set; }
+        public float RelativeY { get; set; }
+        public float RelativeSpeedX { get; set; }
+        public float RelativeSpeedY { get; set; }
     }
 }

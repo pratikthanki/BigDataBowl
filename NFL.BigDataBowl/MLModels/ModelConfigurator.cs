@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Microsoft.ML;
 using Microsoft.ML.Data;
@@ -23,12 +24,35 @@ namespace NFL.BigDataBowl.MLModels
             mlContext = new MLContext();
         }
 
-        public static void Run(
-            Dictionary<(long GameId, int Season, long PlayId, int Yards), List<PlayMetrics>> playerMetricsPerPlay,
-            CancellationToken cancellationToken)
+        public static void Run(IEnumerable<RushingRaw> rushingMetrics, CancellationToken cancellationToken)
         {
-            var meta = playerMetricsPerPlay.Keys;
-            var plays = playerMetricsPerPlay.Values;
+            var playerMetricsPerPlay = rushingMetrics
+                .GroupBy(x => (x.GameId, x.Season, x.PlayId, x.Yards))
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var plays = playerMetricsPerPlay
+                .Select(x => x.Value)
+                .SelectMany(_ => _)
+                .Select(x => new PlayMetrics()
+                {
+                    NflId = x.NflId,
+                    GameId = x.GameId,
+                    Season = x.Season,
+                    Yards = x.Yards,
+                    PlayId = x.PlayId,
+                    Quarter = x.Quarter,
+                    Down = x.Down,
+                    MinutesRemainingInQuarter = x.MinutesRemainingInQuarter,
+                    YardsFromOwnGoal = x.YardsFromOwnGoal,
+                    IsOffenseLeading = x.IsOffenseLeading,
+                    StandardisedX = x.StandardisedX,
+                    StandardisedY = x.StandardisedY,
+                    StandardisedDir = x.StandardisedDir,
+                    RelativeX = x.RelativeX,
+                    RelativeY = x.RelativeY,
+                    RelativeSpeedX = x.RelativeSpeedX,
+                    RelativeSpeedY = x.RelativeSpeedY
+                }).ToList();
 
             var data = mlContext.Data.LoadFromEnumerable(plays);
             var dataSplit = mlContext.Data.TrainTestSplit(data, 0.2);
