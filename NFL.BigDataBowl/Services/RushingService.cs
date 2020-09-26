@@ -58,6 +58,9 @@ namespace NFL.BigDataBowl.Services
 
                 Environment.ExitCode = 1;
             }
+            
+            _cancellationTokenSource.Cancel();
+            Environment.ExitCode = 0;
         }
 
         public async Task StopAsync(CancellationToken token)
