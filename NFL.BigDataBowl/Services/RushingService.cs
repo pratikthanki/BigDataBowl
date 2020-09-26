@@ -20,7 +20,7 @@ namespace NFL.BigDataBowl.Services
             _transformer = new DataTransformer(_logger);
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(appLifetime.ApplicationStopping);
 
-            Environment.ExitCode = 1;
+            Environment.ExitCode = 0;
 
             _cancellationTokenSource.Token.Register(() =>
             {
@@ -46,7 +46,18 @@ namespace NFL.BigDataBowl.Services
 
         private async Task RunRushingService()
         {
-            ModelConfigurator.Run(_transformer.ReadAndPreprocess(), _cancellationTokenSource.Token);
+            try
+            {
+                var data = _transformer.ReadAndPreprocess();
+                ModelConfigurator.Run(data, _cancellationTokenSource.Token);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogCritical(exception.ToString());
+                _cancellationTokenSource.Cancel();
+
+                Environment.ExitCode = 1;
+            }
         }
 
         public async Task StopAsync(CancellationToken token)
