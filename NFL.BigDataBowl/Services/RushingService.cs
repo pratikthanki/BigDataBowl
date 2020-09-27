@@ -11,12 +11,14 @@ namespace NFL.BigDataBowl.Services
     {
         private static ILogger _logger;
         private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly ModelConfigurator _modelConfigurator;
         private Task _task;
         private static DataTransformer _transformer;
 
         public RushingService(ILogger<RushingService> logger, IHostApplicationLifetime appLifetime)
         {
             _logger = logger;
+            _modelConfigurator = new ModelConfigurator();
             _transformer = new DataTransformer(_logger);
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(appLifetime.ApplicationStopping);
 
@@ -49,7 +51,7 @@ namespace NFL.BigDataBowl.Services
             try
             {
                 var data = _transformer.ReadAndPreprocess();
-                ModelConfigurator.Run(data);
+                _modelConfigurator.Run(data);
             }
             catch (Exception exception)
             {

@@ -121,7 +121,10 @@ namespace NFL.BigDataBowl
                     (float) (play.S * Math.Sin(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedY);
 
                 rushingPlays.Add(play);
-                ReportProgress(rushingPlays.Count);
+                ReportProgress(rushingPlays.Count, 10_000);
+
+                if (rushingPlays.Count == 1_100)
+                    return rushingPlays;
             }
 
             _logger.LogInformation($"Total rows: {rushingPlays.Count}");
@@ -172,7 +175,7 @@ namespace NFL.BigDataBowl
                 play.RelativeSpeedY = play.StandardisedSpeedY - rusher.StandardisedSpeedY;
 
                 count++;
-                ReportProgress(count);
+                ReportProgress(count, 50_000);
             }
             
             _logger.LogInformation($"Total rows: {count}");
@@ -181,9 +184,9 @@ namespace NFL.BigDataBowl
             return rushingPlays;
         }
 
-        private static void ReportProgress(int count)
+        private static void ReportProgress(int count, int threshold)
         {
-            if (count % 10_000 == 0)
+            if (count % threshold == 0)
                 _logger.LogInformation($"Rows preprocessed: {count}");
         }
 
