@@ -1,9 +1,9 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFL.BigDataBowl", "NFL.BigDataBowl\NFL.BigDataBowl.csproj", "{15C74D61-0D2E-46B5-8DCA-255B701809C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BigDataBowl", "BigDataBowl\BigDataBowl.csproj", "{15C74D61-0D2E-46B5-8DCA-255B701809C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFL.Combine", "NFL.Combine\NFL.Combine.csproj", "{DE1E7A58-8206-49B6-B6DC-3DB9F09678FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Combine", "Combine\Combine.csproj", "{DE1E7A58-8206-49B6-B6DC-3DB9F09678FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,5 +19,12 @@ Global
 		{DE1E7A58-8206-49B6-B6DC-3DB9F09678FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE1E7A58-8206-49B6-B6DC-3DB9F09678FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE1E7A58-8206-49B6-B6DC-3DB9F09678FA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
+		$0.StandardHeader = $2
+		$0.VersionControlPolicy = $3
 	EndGlobalSection
 EndGlobal
