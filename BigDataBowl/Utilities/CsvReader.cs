@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NFL.BigDataBowl.Utilities
+namespace BigDataBowl.Utilities
 {
     public static class CsvReader
     {

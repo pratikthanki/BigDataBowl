@@ -1,11 +1,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BigDataBowl.MLModels;
+using BigDataBowl.Utilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NFL.BigDataBowl.MLModels;
 
-namespace NFL.BigDataBowl.Services
+namespace BigDataBowl.Services
 {
     public class RushingService : IHostedService
     {

@@ -1,9 +1,7 @@
-## NFL Zahlen
+## NFL Big Data Bowl 
 
-Zaheln? Because I couldn't think of another name and it's *numbers* in German.
+In early 2020 the NFL launched its second [Big Data Bowl](https://www.kaggle.com/c/nfl-big-data-bowl-2020) competition on Kaggle, most/all entries for this were written in Python or R.
 
-So, the NFL is the sport I'm most interested/passionate about. I worked with a few teams during my time at a sports tech start-up and got to see what it was like - awesome!
+This is my attempt to use [TensorFlow.NET](https://scisharp.github.io/SciSharp/) and more generally, the C# and the .NET stack to answer the question;
 
-The interests has only gotten stronger, from the rise of tracking data with [Next Gen Stats](https://nextgenstats.nfl.com/) and following the work of [PFF](https://www.pff.com/).
-
-With this work I'm going to explore Combine + Draft and Tracking data!
+> How many yards will an NFL player gain after receiving a handoff?

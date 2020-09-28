@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using BigDataBowl.Services;
+using BigDataBowl.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NFL.BigDataBowl.Services;
-using NFL.BigDataBowl.Utilities;
+using Microsoft.Extensions.Hosting;
 
-namespace NFL.BigDataBowl
+namespace BigDataBowl
 {
     class Program
     {

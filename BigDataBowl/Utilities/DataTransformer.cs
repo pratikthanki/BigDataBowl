@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BigDataBowl.DataModels;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
-using NFL.BigDataBowl.DataModels;
-using NFL.BigDataBowl.Utilities;
 
-namespace NFL.BigDataBowl
+namespace BigDataBowl.Utilities
 {
     public class DataTransformer
     {

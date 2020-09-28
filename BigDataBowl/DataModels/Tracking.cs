@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NFL.BigDataBowl.DataModels
+namespace BigDataBowl.DataModels
 {
     public class Tracking
     {

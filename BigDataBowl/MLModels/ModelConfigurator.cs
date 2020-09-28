@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NFL.BigDataBowl.DataModels;
+using BigDataBowl.DataModels;
 using NumSharp;
 using Tensorflow;
 using static Tensorflow.Binding;
 
-namespace NFL.BigDataBowl.MLModels
+namespace BigDataBowl.MLModels
 {
     public class ModelConfigurator
     {

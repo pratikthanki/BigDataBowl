@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BigDataBowl.DataModels;
+using BigDataBowl.Utilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
-using NFL.BigDataBowl.DataModels;
-using NFL.BigDataBowl.Utilities;
 
-namespace NFL.BigDataBowl.Services
+namespace BigDataBowl.Services
 {
     public class TrackingService : IHostedService
     {

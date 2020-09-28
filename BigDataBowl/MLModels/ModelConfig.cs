@@ -1,4 +1,5 @@
-namespace NFL.BigDataBowl.MLModels
+
+namespace BigDataBowl.MLModels
 {
     public class ModelConfig
     {

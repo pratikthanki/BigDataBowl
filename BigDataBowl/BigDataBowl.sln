@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NFL.BigDataBowl", "NFL.BigDataBowl.csproj", "{4E82D90D-9500-45CC-970B-7DAB95E5E580}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BigDataBowl", "NFL.BigDataBowl.csproj", "{4E82D90D-9500-45CC-970B-7DAB95E5E580}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

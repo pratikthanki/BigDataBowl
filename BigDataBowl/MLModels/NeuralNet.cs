@@ -4,7 +4,7 @@ using Tensorflow.Keras.Engine;
 using static Tensorflow.Binding;
 using Activation = Tensorflow.Keras.Activation;
 
-namespace NFL.BigDataBowl.MLModels
+namespace BigDataBowl.MLModels
 {
     public class NeuralNet : Model
     {
@@ -18,8 +18,6 @@ namespace NFL.BigDataBowl.MLModels
         {
             // First fully-connected hidden layer.
             fc1 = Dense(args.NeuronOfHidden1, args.Activation1);
-            
-            norm = Dense(1, (Activation) tf.keras.layers.n)
             
             // Second fully-connected hidden layer.
             fc2 = Dense(args.NeuronOfHidden2, args.Activation2);

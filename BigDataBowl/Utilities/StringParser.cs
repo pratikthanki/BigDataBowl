@@ -1,6 +1,6 @@
 using System;
 
-namespace NFL.BigDataBowl.Utilities
+namespace BigDataBowl.Utilities
 {
     public static class StringParser
     {

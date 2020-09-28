@@ -1,5 +1,5 @@
 
-namespace NFL.BigDataBowl.DataModels
+namespace BigDataBowl.DataModels
 {
     public class PlayMetrics
     {
