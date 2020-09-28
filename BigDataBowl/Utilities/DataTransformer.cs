@@ -100,24 +100,28 @@ namespace BigDataBowl.Utilities
                 };
 
                 play.IsLeftDirection = play.PlayDirection == "left";
+                play.PlayDirectionEncoded = play.IsLeftDirection ? 1 : 0;
                 play.IsBallCarrier = play.NflId == play.NflIdRusher;
-                play.IsOffenseLeading = play.TeamOnOffense == "home"
-                    ? play.HomeScoreBeforePlay > play.VisitorScoreBeforePlay
-                    : play.HomeScoreBeforePlay < play.VisitorScoreBeforePlay;
 
                 play.MinutesRemainingInQuarter = MinutesRemaining(play.GameClock);
                 play.TimeDelta = (int) play.TimeHandoff.Subtract(play.TimeSnap).TotalSeconds;
 
-                // Standardise location so offense is heading right and speed metrics into radians 
                 play.StandardisedOrientation = play.IsLeftDirection ? (180 + play.Orientation) % 360 : play.Orientation;
-                play.StandardisedDir = StandardiseDir(play.IsLeftDirection, play.Dir);
+                play.StandardisedOrientationX = (float) Math.Cos(play.Orientation * 2 * Math.PI / 360);
+                play.StandardisedOrientationY = (float) Math.Sin(play.Orientation * 2 * Math.PI / 360);
+
+                play.StandardisedDir = play.IsLeftDirection ? (180 + play.Dir) % 360 : play.Dir;
+                play.StandardisedDirX = (float) Math.Cos(play.Orientation * 2 * Math.PI / 360);
+                play.StandardisedDirY = (float) Math.Sin(play.Orientation * 2 * Math.PI / 360);
 
                 play.StandardisedX = play.IsLeftDirection ? 120 - play.X : play.X;
                 play.StandardisedY = (float) (play.IsLeftDirection ? 160 / 3.0 - play.Y : play.Y);
+
                 play.StandardisedSpeedX =
                     (float) (play.S * Math.Cos(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedX);
                 play.StandardisedSpeedY =
                     (float) (play.S * Math.Sin(90 - play.StandardisedDir * Math.PI / 180) + play.StandardisedY);
+
 
                 rushingPlays.Add(play);
                 ReportProgress(rushingPlays.Count, 10_000);
@@ -156,22 +160,29 @@ namespace BigDataBowl.Utilities
                 play.HomeTeamAbbr = teamMap[play.HomeTeamAbbr];
                 play.VisitorTeamAbbr = teamMap[play.VisitorTeamAbbr];
                 play.FieldPosition = play.FieldPosition == "" ? "50" : teamMap[play.FieldPosition];
-
-                // New bool columns 
                 play.TeamOnOffense = play.PossessionTeam == play.HomeTeamAbbr ? "home" : "away";
                 play.IsOnOffense = play.Team == play.TeamOnOffense;
+
+                play.IsOffenseLeading = play.TeamOnOffense == "home"
+                    ? play.HomeScoreBeforePlay > play.VisitorScoreBeforePlay
+                    : play.HomeScoreBeforePlay < play.VisitorScoreBeforePlay;
 
                 play.YardsFromOwnGoal = play.FieldPosition == play.PossessionTeam
                     ? play.YardLine == 50 ? 50 : play.YardLine
                     : 50 + (50 - play.YardLine);
 
                 play.StandardisedYardLine =
-                    play.FieldPosition == play.PossessionTeam ? play.YardLine : 100 - play.YardLine;
+                    play.PossessionTeam != play.FieldPosition ? 100 - play.YardLine : play.YardLine;
 
                 play.RelativeX = play.StandardisedX - rusher.StandardisedX;
                 play.RelativeY = play.StandardisedY - rusher.StandardisedY;
                 play.RelativeSpeedX = play.StandardisedSpeedX - rusher.StandardisedSpeedX;
                 play.RelativeSpeedY = play.StandardisedSpeedY - rusher.StandardisedSpeedY;
+
+                play.DistanceToBall =
+                    (float) Math.Pow(
+                        Math.Pow(play.StandardisedX - rusher.StandardisedX, 2) +
+                        Math.Pow(play.StandardisedY - rusher.StandardisedY, 2), 0.5);
 
                 count++;
                 ReportProgress(count, 50_000);
@@ -219,20 +230,6 @@ namespace BigDataBowl.Utilities
             var clock = new TimeSpan(0, gameClock.Hour, gameClock.Minute);
 
             return (float) ((int) clock.Subtract(start).TotalSeconds / 60.0);
-        }
-
-        private static float StandardiseDir(bool isLeft, float dir)
-        {
-            float standardisedDir;
-            if (isLeft && dir < 90)
-                standardisedDir = dir + 360;
-            else if (!isLeft && dir > 270)
-                standardisedDir = dir - 360;
-            else
-                standardisedDir = dir;
-
-            // When the offense is moving left minus 180 from the standardised direction
-            return isLeft ? standardisedDir - 180 : standardisedDir;
         }
     }
 }

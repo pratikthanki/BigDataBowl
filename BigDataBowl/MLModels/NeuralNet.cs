@@ -8,28 +8,30 @@ namespace BigDataBowl.MLModels
 {
     public class NeuralNet : Model
     {
-        private readonly Layer fc1;
-        private readonly Layer fc2;
-        private readonly Layer norm;
+        private readonly Layer layerOne;
+        private readonly Layer layerTwo;
+        private readonly Layer layerThree;
+        private readonly Layer layerFour;
         private readonly Layer output;
 
         public NeuralNet(NeuralNetArgs args) :
             base(args)
         {
-            // First fully-connected hidden layer.
-            fc1 = Dense(args.NeuronOfHidden1, args.Activation1);
-            
-            // Second fully-connected hidden layer.
-            fc2 = Dense(args.NeuronOfHidden2, args.Activation2);
-
-            output = Dense(args.NumClasses);
+            // Fully connected hidden layers 
+            layerOne = Dense(args.NeuronOfHidden1, args.Activation1);
+            layerTwo = Dense(args.NeuronOfHidden2, args.Activation2);
+            layerThree = Dense(args.NeuronOfHidden3, args.Activation3);
+            layerFour = Dense(args.NeuronOfHidden4, args.Activation4);
+            output = Dense(args.NumClasses, args.ActivationOutput);
         }
 
         // Set forward pass.
         protected override Tensor call(Tensor inputs, bool is_training = false, Tensor state = null)
         {
-            inputs = fc1.Apply(inputs);
-            inputs = fc2.Apply(inputs);
+            inputs = layerOne.Apply(inputs);
+            inputs = layerTwo.Apply(inputs);
+            inputs = layerThree.Apply(inputs);
+            inputs = layerFour.Apply(inputs);
             inputs = output.Apply(inputs);
 
             if (!is_training)
@@ -41,13 +43,15 @@ namespace BigDataBowl.MLModels
 
     public class NeuralNetArgs : ModelArgs
     {
-        public int NeuronOfHidden1 { get; set; }
-        public Activation Activation1 { get; set; }
-
-        public int NeuronOfHidden2 { get; set; }
-        public Activation Activation2 { get; set; }
-
         public int NumClasses { get; set; }
         public Activation ActivationOutput { get; set; }
+        public int NeuronOfHidden1 { get; set; }
+        public Activation Activation1 { get; set; }
+        public int NeuronOfHidden2 { get; set; }
+        public Activation Activation2 { get; set; }
+        public int NeuronOfHidden3 { get; set; }
+        public Activation Activation3 { get; set; }
+        public int NeuronOfHidden4 { get; set; }
+        public Activation Activation4 { get; set; }
     }
 }

@@ -56,6 +56,7 @@ namespace BigDataBowl.DataModels
 
         // Flip location/tracking data so all plays appears as going from left to right
         public bool IsLeftDirection { get; set; }
+        public float PlayDirectionEncoded { get; set; }
         public bool IsBallCarrier { get; set; }
         public bool IsOnOffense { get; set; }
         public bool IsOffenseLeading { get; set; }
@@ -66,13 +67,18 @@ namespace BigDataBowl.DataModels
         public float StandardisedX { get; set; }
         public float StandardisedY { get; set; }
         public float StandardisedDir { get; set; }
+        public float StandardisedDirX { get; set; }
+        public float StandardisedDirY { get; set; }
         public float StandardisedSpeedX { get; set; }
         public float StandardisedSpeedY { get; set; }
         public int StandardisedYardLine { get; set; }
         public float StandardisedOrientation { get; set; }
+        public float StandardisedOrientationX { get; set; }
+        public float StandardisedOrientationY { get; set; }
         public float RelativeX { get; set; }
         public float RelativeY { get; set; }
         public float RelativeSpeedX { get; set; }
         public float RelativeSpeedY { get; set; }
+        public float DistanceToBall { get; set; }
     }
 }

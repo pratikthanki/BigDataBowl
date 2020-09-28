@@ -10,11 +10,10 @@ namespace BigDataBowl.MLModels
 {
     public class ModelConfigurator
     {
-        private const int Classes = 100;
-        private const float LearningRate = 0.1f;
+        private const float LearningRate = 0.001f;
         private const int DisplayStep = 100;
         private const int BatchSize = 180;
-        private int TrainingSteps = 1000;
+        private const int TrainingSteps = 1000;
 
         private float accuracy;
         private IDatasetV2 TrainData;
@@ -33,18 +32,16 @@ namespace BigDataBowl.MLModels
 
         public void Run(IEnumerable<RushingRaw> rushing)
         {
-            var playerMetricsPerPlay = rushing
+            var plays = rushing
                 .GroupBy(x => (x.GameId, x.Season, x.PlayId, x.Yards))
-                .ToDictionary(g => g.Key, g => g.ToList());
-
-            var plays = playerMetricsPerPlay
+                .ToDictionary(g => g.Key, g => g.ToList())
                 .Select(x => x.Value).ToList();
+            
+            var trainSplit = plays.Count - (int) (0.2 * plays.Count);
 
             #region Train-Test Data
 
-            var testSplit = (int) (0.2 * plays.Count);
-
-            var trainMetrics = plays.Select(x => new[]
+            var metrics = plays.Select(x => new[]
             {
                 // x[0].GameId,
                 // x[0].Season,
@@ -253,10 +250,13 @@ namespace BigDataBowl.MLModels
                 x[21].RelativeY,
                 x[21].RelativeSpeedX,
                 x[21].RelativeSpeedY
-            }).ToArray();
+            }).ToList();
 
-            XTrain = np.array(trainMetrics);
-            YTrain = np.array(plays.Select(x => x[0].Yards));
+            XTrain = np.array(metrics.Take(trainSplit).ToArray());
+            YTrain = np.array(plays.Take(trainSplit).Select(x => x[0].Yards));
+
+            XTest = np.array(metrics.Skip(trainSplit).ToArray());
+            YTest = np.array(plays.Skip(trainSplit).Select(x => x[0].Yards));
 
             #endregion
 
@@ -271,14 +271,18 @@ namespace BigDataBowl.MLModels
                 .take(TrainingSteps);
 
             // Build neural network model
-            var neural_net = new NeuralNet(new NeuralNetArgs
+            var neuralNet = new NeuralNet(new NeuralNetArgs
             {
-                NumClasses = Classes,
+                NumClasses = 199,
                 NeuronOfHidden1 = 128,
                 Activation1 = tf.keras.activations.Relu,
                 NeuronOfHidden2 = 256,
                 Activation2 = tf.keras.activations.Relu,
-                ActivationOutput = tf.keras.activations.Relu
+                NeuronOfHidden3 = 512,
+                Activation3 = tf.keras.activations.Relu,
+                NeuronOfHidden4 = 512,
+                Activation4 = tf.keras.activations.Relu,
+                ActivationOutput = tf.keras.activations.Sigmoid,
             });
 
             /*
@@ -291,7 +295,8 @@ namespace BigDataBowl.MLModels
             Tensor CrossEntropyLoss(Tensor x, Tensor y)
             {
                 y = tf.cast(y, tf.int64);
-                var loss = tf.nn.sparse_softmax_cross_entropy_with_logits(y, x);
+                // var loss = tf.nn.sparse_softmax_cross_entropy_with_logits(y, x);
+                var loss = tf.nn.softmax(x);
 
                 return tf.reduce_mean(loss);
             }
@@ -301,14 +306,14 @@ namespace BigDataBowl.MLModels
              * 
              * Predicted class is the index of highest score in prediction vector (i.e. argmax).
              */
-            Tensor Accuracy(Tensor y_pred, Tensor y_true)
+            Tensor Accuracy(Tensor yPred, Tensor yTrue)
             {
-                var correct_prediction = tf.equal(tf.argmax(y_pred, 1), tf.cast(y_true, tf.int64));
-                return tf.reduce_mean(tf.cast(correct_prediction, tf.float32), -1);
+                var correctPrediction = tf.equal(tf.argmax(yPred, 1), tf.cast(yTrue, tf.int64));
+                return tf.reduce_mean(tf.cast(correctPrediction, tf.float32), -1);
             }
 
             // Stochastic gradient descent optimizer.
-            var optimizer = tf.optimizers.SGD(LearningRate);
+            var optimizer = tf.optimizers.Adam(LearningRate, 0.9f, 0.9f);
 
             /*
              * Optimization process
@@ -319,37 +324,37 @@ namespace BigDataBowl.MLModels
             {
                 using var g = tf.GradientTape();
 
-                var pred = neural_net.Apply(x, is_training: true);
+                var pred = neuralNet.Apply(x, is_training: true);
                 var loss = CrossEntropyLoss(pred, y);
 
-                var gradients = g.gradient(loss, neural_net.trainable_variables);
+                var gradients = g.gradient(loss, neuralNet.trainable_variables);
 
                 // Update W and b following gradients
                 optimizer.apply_gradients(
-                    zip(gradients, neural_net.trainable_variables.Select(i => i as ResourceVariable)));
+                    zip(gradients, neuralNet.trainable_variables.Select(i => i as ResourceVariable)));
             }
 
             // Run training for the given number of steps.
-            foreach (var (step, (batch_x, batch_y)) in enumerate(TrainData, 1))
+            foreach (var (step, (batchX, batchY)) in enumerate(TrainData, 1))
             {
                 // Run the optimization to update W and b values.
-                RunOptimization(batch_x, batch_y);
+                RunOptimization(batchX, batchY);
 
                 if (step % DisplayStep != 0)
                     continue;
 
-                var pred = neural_net.Apply(batch_x, is_training: true);
-                var loss = CrossEntropyLoss(pred, batch_y);
-                var acc = Accuracy(pred, batch_y);
+                var pred = neuralNet.Apply(batchX, is_training: true);
+                var loss = CrossEntropyLoss(pred, batchY);
+                var acc = Accuracy(pred, batchY);
 
                 Console.WriteLine($"step: {step}, loss: {(float) loss}, accuracy: {(float) acc}");
             }
 
             // Test model on validation set.
             {
-                var pred = neural_net.Apply(XTest, is_training: false);
+                var pred = neuralNet.Apply(XTest, is_training: false);
                 accuracy = (float) Accuracy(pred, YTest);
-                Console.WriteLine($"Test Accuracy: {this.accuracy}");
+                Console.WriteLine($"Test Accuracy: {accuracy}");
             }
 
             Console.WriteLine($"Model accuracy: {accuracy}");
